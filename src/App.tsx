@@ -2,8 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
-import heroVideoSrc from './assets/VIDEO_a22b7f24-5e95-49d7-969b-f7b756f1c4bd.mp4';
-import footerBackground from './assets/Gemini_Generated_Image_uswi6luswi6luswi.png';
+
 import React, { useEffect, useRef, useState } from "react";
 import TrueFocus from "./components/TrueFocus";
 import GradualBlur from "./components/GradualBlur";
@@ -14,6 +13,12 @@ import BlurText from "./components/BlurText";
 import OptionWheel from "./components/OptionWheel";
 import FlowerCTAWrapper from "./components/FlowerClusterPopup";
 import ParticleText from "./components/ParticleText";
+import GlassAssembly from "./components/GlassAssembly";
+import Masonry from "./components/Masonry";
+import soloLevelingImg from "./assets/images/solo_leveling_system_1795336680643.jpg";
+import infixClothingImg from "./assets/images/infix_premium_clothing_1795336680522.jpg";
+import cookbookPlannerImg from "./assets/images/cookbook_recipe_planner_1795336682038.jpg";
+import floralSpectrumImg from "./assets/images/floral_spectrum_botany_1795336681487.jpg";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -24,14 +29,13 @@ import {
   ChevronUp,
   X,
   Plus,
-  Zap,
   Send,
   Calendar,
-  ShieldCheck,
-  Terminal,
   ArrowRight,
   Copy,
   Check,
+  LayoutGrid,
+  Sparkles,
   Volume2,
   VolumeX
 } from "lucide-react";
@@ -152,7 +156,7 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
             </div>
 
             {/* Main Title placed at the bottom */}
-            <h4 className="text-2xl font-bold text-white tracking-tight drop-shadow-md">
+            <h4 className="text-xl xl:text-2xl font-bold text-white tracking-tight drop-shadow-md">
               {item.title}
             </h4>
           </div>
@@ -189,7 +193,7 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
             </div>
 
             {/* Main Title placed at the bottom */}
-            <h4 className="text-2xl font-bold text-white tracking-tight drop-shadow-md">
+            <h4 className="text-xl xl:text-2xl font-bold text-white tracking-tight drop-shadow-md">
               {item.title}
             </h4>
           </div>
@@ -207,43 +211,89 @@ export default function App() {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [interviewSubject, setInterviewSubject] = useState("Technical Interview Request - Full Stack Developer");
   const [interviewMessage, setInterviewMessage] = useState("Hi Sakshi,\n\nI am a Tech Lead looking for someone to ship full-stack features rapidly. Your portfolio caught my attention. Let's schedule a 20-minute intro call.");
-  // Hero video controls
-  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
-  const [videoAudioEnabled, setVideoAudioEnabled] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
 
   useEffect(() => {
-    const video = heroVideoRef.current;
+    const video = videoRef.current;
     if (!video) return;
 
     video.muted = false;
-    void video.play()
-      .then(() => setVideoAudioEnabled(true))
-      .catch(() => {
-        // Audible autoplay is blocked by most browsers without prior interaction.
-        video.muted = true;
-        setVideoAudioEnabled(false);
-        void video.play().catch(() => {
-          // Playback remains available through the browser's media controls.
+    const playPromise = video.play();
+
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          setIsVideoMuted(false);
+        })
+        .catch(() => {
+          if (video) {
+            video.muted = true;
+            setIsVideoMuted(true);
+            video.play().catch(() => {});
+          }
         });
-      });
+    }
+
+    const handleFirstInteraction = () => {
+      const v = videoRef.current;
+      if (v && v.muted) {
+        v.muted = false;
+        setIsVideoMuted(false);
+        v.play().catch(() => {});
+      }
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
+    };
+
+    window.addEventListener("click", handleFirstInteraction, { once: true });
+    window.addEventListener("keydown", handleFirstInteraction, { once: true });
+    window.addEventListener("touchstart", handleFirstInteraction, { once: true });
+
+    return () => {
+      window.removeEventListener("click", handleFirstInteraction);
+      window.removeEventListener("keydown", handleFirstInteraction);
+      window.removeEventListener("touchstart", handleFirstInteraction);
+    };
   }, []);
 
-  const toggleHeroAudio = async (): Promise<void> => {
-    const video = heroVideoRef.current;
+  const toggleVideoAudio = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
     if (!video) return;
-
-    try {
-      video.muted = videoAudioEnabled;
-      await video.play();
-      setVideoAudioEnabled(!videoAudioEnabled);
-    } catch {
-      video.muted = true;
-      setVideoAudioEnabled(false);
+    const nextMuted = !video.muted;
+    video.muted = nextMuted;
+    setIsVideoMuted(nextMuted);
+    if (!nextMuted) {
+      video.play().catch(() => {});
     }
   };
 
   useGSAP(() => {
-    // Scroll progress trigger or subtle visual scroll enhancements if needed
+    const unpublishedCards = gsap.utils.toArray<HTMLElement>(".unpublished-project-card");
+    const cols = window.innerWidth >= 768 ? 4 : 2;
+
+    unpublishedCards.forEach((card, index) => {
+      const fromX = index % 2 === 0 ? -90 : 90;
+      gsap.fromTo(
+        card,
+        { opacity: 0, x: fromX },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.75,
+          delay: (index % cols) * 0.14,
+          ease: "power3.out",
+          clearProps: "transform",
+          scrollTrigger: {
+            trigger: card,
+            start: "top 88%",
+            once: true,
+          },
+        }
+      );
+    });
   }, { scope: containerRef });
 
   // Modal Animation - Separate effect to avoid re-triggering scroll animations
@@ -259,7 +309,7 @@ export default function App() {
   }, { scope: containerRef, dependencies: [selectedProject, showInviteModal] });
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText("sakshijangid@gmail.com");
+    navigator.clipboard.writeText("sakshiijangid@gmail.com");
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2500);
   };
@@ -270,14 +320,11 @@ export default function App() {
   );
 
   const mailLink = isMobileDevice
-    ? `https://mail.google.com/mail/?view=cm&fs=1&to=sakshijangid@gmail.com&su=${encodeURIComponent(interviewSubject)}&body=${encodeURIComponent(interviewMessage)}`
-    : `mailto:sakshijangid@gmail.com?subject=${encodeURIComponent(interviewSubject)}&body=${encodeURIComponent(interviewMessage)}`;
+    ? `https://mail.google.com/mail/?view=cm&fs=1&to=sakshiijangid@gmail.com&su=${encodeURIComponent(interviewSubject)}&body=${encodeURIComponent(interviewMessage)}`
+    : `mailto:sakshiijangid@gmail.com?subject=${encodeURIComponent(interviewSubject)}&body=${encodeURIComponent(interviewMessage)}`;
 
   return (
-    <div ref={containerRef} className="bg-white text-[#1A1A1A] font-sans antialiased selection:bg-[#966F33] selection:text-white">
-      {/* Scroll Progress Bar */}
-      <div className="scroll-progress fixed top-0 left-0 w-full h-1 bg-[#966F33] origin-left scale-x-0 z-[100]" />
-
+    <div ref={containerRef} className="bg-white text-[#1A1A1A] font-sans antialiased selection:bg-[#966F33] selection:text-white overflow-x-clip w-full max-w-full">
       {/* Direct Interview Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
@@ -300,7 +347,7 @@ export default function App() {
 
             <h2 className="text-3xl font-bold mb-2">Schedule a Technical Interview</h2>
             <p className="text-gray-600 text-sm mb-6">
-              Skip the HR screen. Send a direct interview request straight to my inbox: <span className="font-semibold text-black">sakshijangid@gmail.com</span>.
+              Skip the HR screen. Send a direct interview request straight to my inbox: <span className="font-semibold text-black">sakshiijangid@gmail.com</span>.
             </p>
 
             <div className="space-y-4 mb-6">
@@ -369,24 +416,28 @@ export default function App() {
             </button>
             
             <div className="mb-8">
-              <h2 className="text-4xl font-bold mb-2">{selectedProject.name}</h2>
-              <p className="text-[#8C2D40] uppercase tracking-widest font-bold text-xs mb-3">Project Blueprint & Rapid Prototype</p>
+              <h2 className="text-4xl font-bold mb-3">{selectedProject.name}</h2>
               <p className="text-stone-600 text-base leading-relaxed max-w-3xl">
                 {selectedProject.description || "An in-development prototype exploring high-velocity UI patterns, responsive full-stack architecture, and streamlined user experiences."}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {selectedProject.gallery.map((img, i) => (
-                <div key={i} className="aspect-video rounded-2xl overflow-hidden bg-gray-100 group">
-                  <img 
-                    src={img} 
-                    alt={`Gallery ${i}`} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-              ))}
+            <div>
+              <Masonry
+                items={selectedProject.gallery.map((img, i) => ({
+                  id: `popup-${selectedProject.id}-${i}`,
+                  img,
+                  height: [420, 320, 480, 360][i % 4] || 380
+                }))}
+                ease="power3.out"
+                duration={0.6}
+                stagger={0.06}
+                animateFrom="bottom"
+                scaleOnHover={true}
+                hoverScale={0.96}
+                blurToFocus={true}
+                colorShiftOnHover={true}
+              />
             </div>
           </div>
         </div>
@@ -488,89 +539,83 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-  return (
-    <section className="relative pt-40 pb-28 px-6 md:px-20 overflow-hidden bg-white">
-      {/* Visual background video */}
-      <video
-        ref={heroVideoRef}
-        src={heroVideoSrc}
-        autoPlay
-        playsInline
-        aria-label="Sakshi portfolio background video"
-        className="hero-video"
-      />
+      <section className="relative pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-0 px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 overflow-hidden bg-[#C3C5C2]">
+        {/* Responsive Background Video (Starts cleanly below fixed header so upper part is never hidden; anchored right-bottom) */}
+        <div className="absolute top-[68px] md:top-[76px] bottom-0 left-0 right-0 z-0 overflow-hidden pointer-events-none bg-[#C3C5C2]">
+          {/* Seamless left-side white bottom wave extension matched proportionally to video height at every breakpoint */}
+          <svg
+            className="absolute bottom-0 left-0 right-0 w-full h-[35px] min-[420px]:h-[38px] sm:h-[45px] md:h-[12%] z-[1] pointer-events-none"
+            viewBox="0 0 1000 120"
+            preserveAspectRatio="none"
+          >
+            <path
+              d="M0,120 L1000,120 L1000,19 C850,22 700,14 500,20 C300,26 150,15 0,20 Z"
+              fill="#ffffff"
+            />
+          </svg>
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted={isVideoMuted}
+            playsInline
+            className="absolute bottom-0 right-0 h-[290px] min-[420px]:h-[320px] sm:h-[380px] md:h-full w-auto max-w-none z-[2] pointer-events-none transform-gpu"
+            style={{ clipPath: 'inset(0 0 4px 0)' }}
+          >
+            <source src="/assets/aistudio/InShot_20261121_204512407_bfa2e43e.mp4" type="video/mp4" />
+          </video>
+          {/* Clean solid white bottom seal bridging seamlessly into the #proof top white wave */}
+          <div className="absolute bottom-0 left-0 right-0 h-[10px] bg-white z-[5] pointer-events-none" />
+        </div>
 
-      <button
-        type="button"
-        onClick={toggleHeroAudio}
-        aria-label={videoAudioEnabled ? "Mute hero video" : "Play hero video with sound"}
-        title={videoAudioEnabled ? "Mute video" : "Play video with sound"}
-        className="absolute right-4 top-24 z-30 inline-flex items-center gap-2 rounded-full border border-white/60 bg-black/45 px-3 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg backdrop-blur-md transition hover:bg-black/70 sm:right-6 sm:top-28 sm:px-4"
-      >
-        {videoAudioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-        <span className="hidden sm:inline">{videoAudioEnabled ? "Sound on" : "Play with sound"}</span>
-      </button>
+        {/* Interactive Audio Toggle Pill */}
+        <button
+          onClick={toggleVideoAudio}
+          className="absolute bottom-5 left-5 sm:bottom-8 sm:left-8 md:left-auto md:bottom-12 md:right-10 z-30 flex items-center space-x-2 px-3.5 py-2 rounded-full bg-stone-900/85 hover:bg-[#8C2D40] text-white text-xs font-mono font-semibold backdrop-blur-md border border-white/30 shadow-lg cursor-pointer transition-all duration-300 hover:scale-105 active:scale-95"
+          title={isVideoMuted ? "Click to play audio" : "Click to mute audio"}
+          aria-label={isVideoMuted ? "Unmute background audio" : "Mute background audio"}
+        >
+          {isVideoMuted ? (
+            <>
+              <VolumeX size={15} className="text-stone-300" />
+              <span>Audio Muted</span>
+            </>
+          ) : (
+            <>
+              <Volume2 size={15} className="text-[#E07A5F] animate-pulse" />
+              <span>Audio On</span>
+            </>
+          )}
+        </button>
 
-        {/* Tech Aesthetic Background Layer */}
-        <div className="absolute inset-0 z-10 bg-grid-tech opacity-40" />
-        <div className="absolute inset-0 z-11 noise" />
-        <div className="absolute inset-0 z-12 vignette" />
-        
-        {/* Screen Corners Decoration */}
-        <div className="absolute top-10 left-10 w-4 h-4 border-t-2 border-l-2 border-[#6B1D2F]/30 z-10" />
-        <div className="absolute top-10 right-10 w-4 h-4 border-t-2 border-r-2 border-[#6B1D2F]/30 z-10" />
-        <div className="absolute bottom-10 left-10 w-4 h-4 border-b-2 border-l-2 border-[#6B1D2F]/30 z-10" />
-        <div className="absolute bottom-10 right-10 w-4 h-4 border-b-2 border-r-2 border-[#6B1D2F]/30 z-10" />
+        <div className="z-10 w-full sm:max-w-[58%] md:max-w-[56%] lg:max-w-[58%] xl:max-w-[780px] 2xl:max-w-[920px] relative">
+          <div className="bg-transparent p-0">
+            <div className="pb-20 sm:pb-24 lg:pb-28 xl:pb-32">
+              <BlurText
+                as="h1"
+                text={"Hi I'm Sakshi\nAs a creative web developer and artist, I bring thoughtful visual care to reliable code that works for tech leads without breaking things."}
+                delay={80}
+                animateBy="words"
+                direction="top"
+                stepDuration={0.35}
+                className="text-[clamp(1.3rem,4.6vw,1.8rem)] md:text-[clamp(1.6rem,3.3vw,3.5rem)] font-extrabold tracking-tight leading-[1.18] md:leading-[1.12] mb-5 sm:mb-6 md:mb-8 text-[#1C1917] max-w-full"
+                getWordClassName={(_word, index, total) => index >= total - 5 ? 'text-[#8C2D40]' : ''}
+              />
 
-        <div className="z-20 max-w-5xl relative">
-          <BlurText
-            as="h1"
-            text={"Hi I'm Sakshi\nAs a creative web developer and artist, I bring thoughtful visual care to reliable code that works for tech leads without breaking things."}
-            delay={80}
-            animateBy="words"
-            direction="top"
-            stepDuration={0.35}
-            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-snug sm:leading-tight mb-8 text-[#1C1917]"
-            getWordClassName={(_word, index, total) => index >= total - 5 ? 'text-[#8C2D40]' : ''}
-          />
+              <p className="text-[clamp(0.8125rem,2.6vw,0.95rem)] md:text-[clamp(0.95rem,1.35vw,1.3rem)] text-stone-800 max-w-[56%] min-[420px]:max-w-[58%] sm:max-w-full lg:max-w-2xl xl:max-w-3xl mb-6 sm:mb-8 md:mb-10 leading-snug sm:leading-relaxed font-medium">
+                I don't just prompt AI - I understand, debug, and refine AI-generated code. Hiring me means getting full-stack feature delivery without the traditional ramp-up delay. Let's build something good together — reach out anytime.
+              </p>
 
-          <p className="text-lg md:text-xl text-stone-700 max-w-3xl mb-10 leading-relaxed font-normal">
-            I don't just prompt AI - I understand, debug, and refine AI-generated code. Hiring me means getting full-stack feature delivery without the traditional ramp-up delay.        Let's build something good together — reach out anytime.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mb-12">
-            <FlowerCTAWrapper>
-              <a 
-                href="#projects" 
-                className="bg-transparent text-[#581C24] border-2 border-[#581C24] px-8 py-4 rounded-full font-bold hover:bg-[#581C24] hover:text-white transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <span>Inspect Shipped Work</span>
-                <ArrowRight size={18} />
-              </a>
-            </FlowerCTAWrapper>
-          </div>
-
-          {/* Value Badges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-6 border-t border-stone-200">
-            <div className="flex items-start space-x-3">
-              <Zap className="text-[#E07A5F] shrink-0 mt-1" size={20} />
-              <div>
-                <h4 className="font-bold text-sm text-[#1C1917]">10x Prototyping Velocity</h4>
-                <p className="text-xs text-stone-600">From concept to functional code in hours, not weeks.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <ShieldCheck className="text-[#E07A5F] shrink-0 mt-1" size={20} />
-              <div>
-                <h4 className="font-bold text-sm text-[#1C1917]">Deep Code Auditing</h4>
-                <p className="text-xs text-stone-600">Comprehending & refactoring AI output for production safety.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <Terminal className="text-[#E07A5F] shrink-0 mt-1" size={20} />
-              <div>
-                <h4 className="font-bold text-sm text-[#1C1917]">Full-Stack Autonomy</h4>
-                <p className="text-xs text-stone-600">MERN, TypeScript, REST APIs, and UI engineering.</p>
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <FlowerCTAWrapper>
+                  <a 
+                    href="#projects" 
+                    className="bg-[#581C24] text-white px-5 sm:px-8 lg:px-9 py-3 sm:py-4 rounded-full font-bold hover:bg-[#8C2D40] hover:scale-105 transition-all duration-300 inline-flex items-center justify-center space-x-2 shadow-lg text-xs sm:text-sm md:text-base xl:text-lg whitespace-nowrap"
+                  >
+                    <span>Inspect Shipped Work</span>
+                    <ArrowRight size={18} />
+                  </a>
+                </FlowerCTAWrapper>
               </div>
             </div>
           </div>
@@ -578,7 +623,7 @@ export default function App() {
       </section>
 
       {/* The Proof Section: 2 Subsections (UI Enhancements & Code Audit Diff) */}
-      <section id="proof" className="pt-36 pb-40 px-6 md:px-20 bg-[#2B0B12] text-white relative overflow-hidden">
+      <section id="proof" className="-mt-[2px] pt-36 pb-40 px-6 md:px-20 bg-[#2B0B12] text-white relative overflow-hidden">
         {/* Top Outer Padding Gradient Ambient Overlay */}
         <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-[#8C2D40]/35 via-[#6B1D2F]/20 to-transparent pointer-events-none z-10" />
         <div className="absolute top-0 left-1/3 w-[600px] h-[220px] bg-gradient-to-r from-[#8C2D40]/50 via-[#E07A5F]/35 to-[#6B1D2F]/45 rounded-full blur-3xl pointer-events-none z-10" />
@@ -588,7 +633,7 @@ export default function App() {
         <div className="absolute bottom-0 right-1/4 w-[600px] h-[220px] bg-gradient-to-r from-[#6B1D2F]/45 via-[#E07A5F]/35 to-[#8C2D40]/50 rounded-full blur-3xl pointer-events-none z-10" />
 
         {/* Top Wave Curve Divider */}
-        <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-20 pointer-events-none -translate-y-[1px]">
+        <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-20 pointer-events-none -translate-y-[2px]">
           <svg 
             className="relative block w-full h-[80px] sm:h-[120px] md:h-[150px]" 
             viewBox="0 0 1440 130" 
@@ -719,9 +764,9 @@ export default function App() {
             </p>
           </div>
 
-          {/* 4 Distinct UI Enhancement Showcase 3D Flip Cards (Uiverse loud-frog-61 style) */}
+          {/* 3 Distinct UI Enhancement Showcase 3D Flip Cards */}
           <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 [&>*:last-child]:md:col-span-2 [&>*:last-child]:lg:col-span-1">
               {[
                 {
                   title: "Analytics & Performance Dashboard",
@@ -746,14 +791,6 @@ export default function App() {
                   enhancedImg: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=1000",
                   rawText: "Desktop-first fixed width layout causing horizontal scrolling and sub-44px touch targets on mobile screens.",
                   enhancedText: "Adaptive mobile viewport layout, 48px+ touch targets, smooth slide transitions, and clear progress steppers."
-                },
-                {
-                  title: "Dark Luxury Portfolio Interface",
-                  badge: "Typography & Micro-Contrast",
-                  rawImg: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&q=80&w=1000",
-                  enhancedImg: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1000",
-                  rawText: "Aggressive neon gradients on pure black (#000000) with poor WCAG contrast ratios and clipped text.",
-                  enhancedText: "Sophisticated deep slate palette (#0F172A), balanced warm neutral highlights, and fluid display typography."
                 }
               ].map((item, idx) => (
                 <ProofFlipCard key={idx} item={item} />
@@ -764,111 +801,93 @@ export default function App() {
       </section>
 
       {/* Projects Section - Shipped Proof */}
-      <section id="projects" className="py-32 px-6 md:px-20 bg-white">
+      <section id="projects" className="py-32 px-6 md:px-20 bg-white overflow-x-clip">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center space-x-4 mb-4">
             <div className="h-[1px] w-12 bg-[#6B1D2F]" />
             <span className="text-[#8C2D40] font-bold uppercase tracking-widest text-lg">Proof of Shipment</span>
           </div>
           
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-[#1C1917]">
-            Published Projects
-          </h2>
-          <p className="text-stone-600 text-lg mb-16 max-w-2xl">
-            Each project demonstrates functional completeness, clean architecture, and rapid deployment readiness.
-          </p>
+          <div className="mb-12">
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-[#1C1917]">
+              Published Projects
+            </h2>
+          </div>
 
-          {/* Published Projects */}
-          <div className="grid md:grid-cols-2 gap-12 mb-20">
-            {[
-              {
-                name: "Inspirova (Artist Discovery)",
-                desc: "Pinterest-style social platform for artists to discover drawing and sketching reference art with MERN stack & Masonry feed.",
-                img: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&q=80&w=1000",
-                link: "https://example.com/inspirova",
-                stack: ["React", "MongoDB", "Express", "Masonry"]
-              },
-              {
-                name: "Solo Leveling System",
-                desc: "Gamified learning system with an AI chatbot powered by Gemini API, dual manual/AI task scheduling, and Firebase Firestore persistence.",
-                img: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&q=80&w=1000",
-                link: "https://example.com/solo-leveling",
-                stack: ["Gemini API", "Firebase", "React", "TailwindCSS"]
-              },
-              {
-                name: "Taskify (Todo Case Study)",
-                desc: "Full-stack task management web application with user authentication and persistent cloud storage, built to overcome client-side state wipe on page refresh.",
-                img: "https://images.unsplash.com/photo-1540350394557-8d14678e7f91?auto=format&fit=crop&q=80&w=1000",
-                link: "https://example.com/taskify",
-                stack: ["React", "Firebase Firestore", "Firebase Auth", "TailwindCSS"]
-              },
-              {
-                name: "Full-Stack E-Commerce Store",
-                desc: "Custom storefront with Supabase database storage, brand identity design in Figma, and integrated UPI online payment gateway.",
-                img: "https://images.unsplash.com/photo-1557821552-17105176677c?auto=format&fit=crop&q=80&w=1000",
-                link: "https://example.com/ecommerce-store",
-                stack: ["React", "Supabase", "UPI Gateway", "Figma"]
-              }
-            ].map((project, i) => (
-              <div key={i} className="section-reveal project-card group bg-[#FDFBF7] p-6 rounded-3xl border border-stone-200/80 shadow-md hover:shadow-xl transition-all flex flex-col justify-between">
-                <div>
-                  <div className="relative aspect-video rounded-2xl overflow-hidden mb-6 group/img">
-                    <img 
-                      src={project.img} 
-                      alt={project.name} 
-                      className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-700"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <a 
-                        href={project.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="bg-[#8C2D40] hover:bg-[#6B1D2F] text-white px-5 py-2.5 rounded-full font-semibold text-sm flex items-center gap-2 shadow-lg transform scale-95 group-hover/img:scale-100 transition-all duration-300"
-                      >
-                        <span>Visit Project</span>
-                        <ExternalLink size={16} />
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-2">
-                    <h4 className="text-2xl font-bold text-[#1C1917]">
-                      {project.name}
-                    </h4>
-                  </div>
-
-                  <p className="text-stone-600 mb-6 text-sm leading-relaxed">{project.desc}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-stone-200">
-                  {project.stack.map((item, idx) => (
-                    <span key={idx} className="text-xs font-bold uppercase tracking-wider bg-white border border-stone-200 px-3 py-1 rounded-full text-stone-800">
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+          {/* Published Projects: Dynamic Masonry Layout */}
+          <div className="mb-20">
+            <Masonry
+              items={[
+                {
+                  id: "pub-1",
+                  img: soloLevelingImg,
+                  url: "https://solo-leveling-system-xi.vercel.app",
+                  height: 540,
+                  title: "Solo Leveling System",
+                  badge: "GAMIFIED LEARNING",
+                  desc: "A gamified task management and learning platform featuring XP progression, daily quests, and adaptive study workflows.",
+                  stack: ["React", "Firebase", "Gemini API"]
+                },
+                {
+                  id: "pub-2",
+                  img: infixClothingImg,
+                  url: "https://example.com/infix-clothing",
+                  height: 540,
+                  title: "Infix - Premium Clothing",
+                  badge: "DIY APPAREL STOREFRONT",
+                  desc: "A luxury e-commerce storefront crafted for bespoke DIY apparel and creative streetwear drops with custom order flows.",
+                  stack: ["React", "Firebase", "Razorpay"]
+                },
+                {
+                  id: "pub-3",
+                  img: cookbookPlannerImg,
+                  url: "https://example.com/cookbook-planner",
+                  height: 560,
+                  title: "Cookbook - Recipe Book & Planner",
+                  badge: "CULINARY & NUTRITION",
+                  desc: "A curated recipe library and weekly meal planner equipped with an interactive macro and nutrition evaluator.",
+                  stack: ["TypeScript", "React", "Gemini API"]
+                },
+                {
+                  id: "pub-4",
+                  img: floralSpectrumImg,
+                  url: "https://floral-spectrum.vercel.app",
+                  height: 560,
+                  title: "Floral Spectrum",
+                  badge: "BOTANICAL ARCHIVE",
+                  desc: "An interactive botanical reference platform built for botanists to explore rare species, taxonomy, and floral traits.",
+                  stack: ["React", "TailwindCSS"]
+                }
+              ]}
+              ease="power3.out"
+              duration={0.6}
+              stagger={0.14}
+              animateFrom="alternate"
+              scrollTrigger={true}
+              scaleOnHover={true}
+              hoverScale={0.96}
+              blurToFocus={true}
+              colorShiftOnHover={true}
+            />
           </div>
 
           {/* In Development Prototypes */}
           <div>
             <h3 className="text-2xl font-bold mb-6 text-[#1C1917]">Prototypes & Concepts in Development</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-2 pb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 md:gap-6 pt-2 pb-4">
               {UNPUBLISHED_PROJECTS.map((project) => (
                 <div 
                   key={project.id} 
-                  className="relative aspect-square rounded-2xl bg-stone-100/50 border border-stone-200/80 p-1 flex items-center justify-center cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
+                  className="unpublished-project-card relative aspect-square rounded-2xl overflow-hidden border border-stone-200/40 md:border-stone-200/60 bg-stone-50 flex items-center justify-center cursor-pointer group shadow-sm hover:shadow-md transition-shadow duration-300"
                   onClick={() => setSelectedProject(project)}
                 >
                   <img 
                     src={project.mainImg} 
                     alt={project.name} 
-                    className="prototype-hover-img w-full h-full object-cover rounded-xl" 
+                    className="prototype-hover-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                     referrerPolicy="no-referrer" 
                   />
-                  <div className="absolute inset-1 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center rounded-xl pointer-events-none">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center pointer-events-none">
                     <Plus className="text-white mb-1 drop-shadow-md" size={24} />
                     <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{project.name}</p>
                   </div>
@@ -880,19 +899,16 @@ export default function App() {
       </section>
 
       {/* Skills & Capabilities Section */}
-      <section id="skills" className="py-24 md:py-32 px-6 md:px-20 bg-white border-t border-stone-100">
+      <section id="skills" className="pt-24 md:pt-32 pb-0 px-6 md:px-20 bg-white border-t border-stone-100">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center space-x-4 mb-4">
             <div className="h-[1px] w-12 bg-[#6B1D2F]" />
             <span className="text-[#8C2D40] font-bold uppercase tracking-widest text-lg">Capabilities</span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-[#1C1917]">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-12 text-[#1C1917]">
             Skills & Technical Mastery
           </h2>
-          <p className="text-stone-600 text-lg mb-12 max-w-2xl">
-            Interactive view of soft skills and full-stack technical competencies.
-          </p>
 
           {/* Interactive Option Wheels for Soft and Technical Skills (No inner boxed container, directly on white canvas) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 mb-20">
@@ -911,12 +927,9 @@ export default function App() {
                   items={[
                     'Code Ownership',
                     'Rapid Learning',
-                    'Technical Leadership',
                     'Effective Communication',
                     'Problem Solving',
                     'Creative Thinking',
-                    'System Design Mindset',
-                    'Critical Analysis',
                     'Client Alignment',
                     'Adaptability'
                   ]}
@@ -954,11 +967,8 @@ export default function App() {
                     'JavaScript',
                     'TypeScript',
                     'React.js',
-                    'Node.js & Express',
                     'TailwindCSS',
                     'System Design',
-                    'REST & GraphQL APIs',
-                    'Next.js',
                     'Firebase & Supabase',
                     'GSAP & Motion',
                     'Git & Github'
@@ -982,31 +992,20 @@ export default function App() {
             </div>
           </div>
 
-          {/* AI-Accelerated Workflow Section (Placed after skills lists) */}
-          <div className="pt-12 border-t border-stone-200">
-            <div className="flex items-center space-x-4 mb-4">
-              <h3 className="text-3xl font-bold text-[#1C1917]">AI-Accelerated Workflow</h3>
-            </div>
-            <p className="text-stone-600 text-base md:text-lg mb-10 max-w-3xl leading-relaxed">
-              How I leverage AI tooling to multiply engineering velocity while maintaining rigorous manual oversight, architectural safety, and production reliability.
-            </p>
+        </div>
+      </section>
 
-            <div className="giant-owl-container">
-              {[
-                { title: "Rapid AI Scaffolding", desc: "Generating boilerplate and UI components in minutes rather than hours with AI prompt engineering." },
-                { title: "Code Audit & Refactoring", desc: "Manually checking type definitions, edge cases, and runtime safety across all application routes." },
-                { title: "API Integration & Logic", desc: "Wiring backend routes, database models, state machines, and external web APIs cleanly." },
-                { title: "Continuous Delivery", desc: "Debugging build errors instantly, verifying performance benchmarks, and deploying builds." }
-              ].map((item, idx) => (
-                <div key={idx} className="giant-owl-card">
-                  <div>
-                    <div className="title-1">{item.title}</div>
-                    <div className="content">{item.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* AI-Accelerated Workflow Section (Full-bleed edge-to-edge with zero horizontal slider/overflow) */}
+      <section id="workflow" className="w-full relative overflow-x-clip bg-white">
+        <div className="max-w-6xl mx-auto px-6 md:px-20 pt-16 pb-8">
+          <div className="flex items-center space-x-4">
+            <div className="h-[1px] w-12 bg-[#6B1D2F]" />
+            <h3 className="text-3xl font-bold text-[#1C1917]">AI-Accelerated Workflow</h3>
           </div>
+        </div>
+
+        <div className="w-full relative overflow-x-clip">
+          <GlassAssembly nextSectionId="education" />
         </div>
       </section>
 
@@ -1023,9 +1022,9 @@ export default function App() {
               href="https://www.linkedin.com/in/sakshi-8b17732b4?utm_source=share_via&utm_content=profile&utm_medium=member_android" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="text-[#8C2D40] font-semibold underline underline-offset-4 hover:text-[#1C1917] transition-colors inline-flex items-center gap-1"
+              className="text-[#8C2D40] font-semibold underline underline-offset-4 hover:text-[#1C1917] transition-colors"
             >
-              LinkedIn Profile <ExternalLink size={15} />
+              LinkedIn Profile
             </a>
           </p>
         </div>
@@ -1077,16 +1076,44 @@ export default function App() {
       </section>
 
       {/* Footer / CTA Section */}
-      <footer 
-        id="contact" 
-        className="bg-[#120E10] text-white pt-40 sm:pt-48 md:pt-56 pb-12 px-6 md:px-20 relative overflow-hidden"
-        style={{
-          backgroundImage: `url(${footerBackground})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
-        }}
-      >
+      <footer id="contact" className="bg-[#020404] text-white pt-48 sm:pt-60 md:pt-72 pb-16 sm:pb-24 px-6 md:px-20 relative overflow-hidden">
+        {/* Responsive Footer Background Image (Statically anchored to bottom with bottom static effect) */}
+        <div className="absolute top-12 sm:top-20 md:top-24 bottom-0 left-0 right-0 z-0 overflow-hidden pointer-events-none select-none bg-[#020404]">
+          <img
+            src="/assets/aistudio/image_30b63e87_aa9ad8f6.jpg"
+            alt=""
+            aria-hidden="true"
+            className="w-full h-full object-cover object-[66%_16%] lg:object-contain lg:object-right-bottom scale-[1.24] origin-[66%_22%] sm:scale-[1.28] sm:origin-[68%_22%] md:scale-[1.32] md:origin-[70%_22%] lg:scale-[1.4] lg:origin-[76%_22%] opacity-90 md:opacity-95 transition-transform duration-700 ease-out"
+          />
+
+          {/* Soft Readability Vignette (desktop left-side text contrast only; no black overlay on mobile) */}
+          <div className="hidden md:block absolute inset-0 bg-gradient-to-r from-[#020404]/85 via-[#020404]/20 to-transparent" />
+
+          {/* Static Noise / Analog Grain Effect intensifying toward the bottom */}
+          <div
+            className="absolute inset-0 opacity-45 mix-blend-screen"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='footerStatic'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23footerStatic)' opacity='0.55'/%3E%3C/svg%3E")`,
+              backgroundSize: '180px 180px',
+              maskImage: 'linear-gradient(to bottom, transparent 35%, rgba(0, 0, 0, 0.45) 72%, rgba(0, 0, 0, 1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 35%, rgba(0, 0, 0, 0.45) 72%, rgba(0, 0, 0, 1) 100%)',
+            }}
+          />
+
+          {/* Subtle Horizontal Scanline Static Texture toward bottom */}
+          <div
+            className="absolute inset-x-0 bottom-0 h-44 opacity-25"
+            style={{
+              backgroundImage: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.08) 0px, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 3px)',
+              maskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 100%)',
+            }}
+          />
+
+          {/* Subtle Bottom Edge Static Grounding (kept minimal on mobile so image stays bright) */}
+          <div className="absolute inset-x-0 bottom-0 h-10 md:h-24 bg-gradient-to-t from-[#020404]/65 via-[#020404]/20 to-transparent md:from-[#020404] md:via-[#020404]/55" />
+        </div>
+
         {/* Top Wave Ambient Blur Gradient Glows */}
         <div className="absolute top-0 left-1/4 -translate-y-1/3 w-[500px] h-[180px] bg-gradient-to-r from-[#8C2D40]/60 via-[#E07A5F]/40 to-[#581C24]/60 rounded-full blur-3xl pointer-events-none z-10" />
         <div className="absolute top-10 right-10 w-[400px] h-[160px] bg-gradient-to-r from-[#6B1D2F]/50 via-[#8C2D40]/40 to-[#2B0C12]/60 rounded-full blur-3xl pointer-events-none z-10" />
@@ -1187,11 +1214,8 @@ export default function App() {
           </svg>
         </div>
 
-        {/* Dark Overlay for Background Image */}
-        <div className="absolute inset-0 bg-[#120E10]/60 pointer-events-none z-5" />
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid md:grid-cols-2 gap-16 mb-16">
+        <div className="max-w-6xl mx-auto relative z-10 pt-12 sm:pt-20 md:pt-32">
+          <div className="grid md:grid-cols-2 gap-16 mb-0 mt-8 sm:mt-14 md:mt-20">
             <div>
               <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-none text-white">
                 Let's work <br />
@@ -1220,7 +1244,7 @@ export default function App() {
                 Are you a Tech Lead looking for a developer who can pick up feature requests and ship them immediately? Let's connect directly.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-row items-center gap-3 sm:gap-4">
                 <FlowerCTAWrapper>
                   <SpecularButton 
                     onClick={() => setShowInviteModal(true)}
@@ -1232,38 +1256,32 @@ export default function App() {
                     lineColor="#ffffff"
                     baseColor="#3D1017"
                     intensity={1.2}
-                    className="font-bold text-sm shadow-xl hover:scale-105 transition-transform"
+                    className="!h-12 sm:!h-14 !py-0 px-5 sm:px-8 font-bold text-xs sm:text-sm shadow-xl hover:scale-105 transition-transform flex items-center justify-center"
                   >
                     <Mail size={18} />
                     <span>Send Interview Invite</span>
                   </SpecularButton>
                 </FlowerCTAWrapper>
-              </div>
-            </div>
 
-            <div className="flex flex-col justify-between items-start md:items-end">
-              <div className="flex space-x-4 mb-8">
                 <a 
                   href="https://www.linkedin.com/in/sakshi-8b17732b4?utm_source=share_via&utm_content=profile&utm_medium=member_android" 
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-4 bg-transparent text-white border-2 border-[#8C2D40] rounded-full hover:bg-[#8C2D40] transition-all"
+                  className="!h-12 !w-12 sm:!h-14 sm:!w-14 !p-0 bg-transparent text-white border-2 border-[#8C2D40] rounded-full hover:bg-[#8C2D40] hover:scale-105 transition-all shrink-0 flex items-center justify-center shadow-lg"
                   aria-label="LinkedIn Profile"
                 >
-                  <Linkedin size={24} />
+                  <Linkedin className="w-5 h-5 sm:w-6 sm:h-6" />
                 </a>
               </div>
+            </div>
 
+            <div className="flex flex-col justify-end items-start md:items-end mt-6 md:mt-0">
               <div className="text-left md:text-right space-y-1">
                 <p className="text-stone-300 text-sm font-medium">Sakshi</p>
                 <p className="text-stone-500 text-xs tracking-widest uppercase">Full-Stack Developer</p>
                 <p className="text-stone-500 text-xs tracking-widest uppercase">Faridabad, Haryana, India</p>
               </div>
             </div>
-          </div>
-          
-          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-stone-500 text-xs">
-            <p>© {new Date().getFullYear()} Sakshi Jangid. Built for high-velocity shipping.</p>
           </div>
         </div>
       </footer>

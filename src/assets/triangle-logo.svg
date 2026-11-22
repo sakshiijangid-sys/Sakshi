@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <filter id="logoGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#E07A5F" flood-opacity="0.35" />
+    </filter>
+  </defs>
+  <g fill="currentColor">
+    <!-- 1. Left Diagonal Leg & Apex ('A') -->
+    <polygon points="
+      64,322
+      192,100
+      208,100
+      234,145
+      212,145
+      200,124
+      188,145
+      164,145
+      92,270
+      82,322
+    " />
+
+    <!-- 2. Central Geometric 'S' -->
+    <polygon points="
+      172,160
+      248,160
+      262,184
+      226,246
+      144,246
+      130,224
+      198,224
+      228,184
+      172,184
+    " />
+
+    <!-- 3. Bottom Horizontal Bar -->
+    <polygon points="
+      134,272
+      228,272
+      214,296
+      120,296
+    " />
+
+    <!-- 4. Bottom-Right Chevron / Right Wing -->
+    <polygon points="
+      256,220
+      276,220
+      332,316
+      284,316
+      270,292
+      298,292
+      256,220
+    " />
+  </g>
+</svg>
