@@ -15,6 +15,7 @@ import FlowerCTAWrapper from "./components/FlowerClusterPopup";
 import ParticleText from "./components/ParticleText";
 import GlassAssembly from "./components/GlassAssembly";
 import Masonry from "./components/Masonry";
+import SwarmCursor from "./components/SwarmCursor";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -536,6 +537,25 @@ export default function App() {
 
   return (
     <div ref={containerRef} className="bg-white text-[#1A1A1A] font-sans antialiased selection:bg-[#966F33] selection:text-white overflow-x-clip w-full max-w-full">
+      {/* Global Swarm Cursor Overlay */}
+      <SwarmCursor
+        globalOverlay
+        hideCursor
+        dotSize={9}
+        count={130}
+        size={2.2}
+        color="#8C2D40"
+        accentColor="#EF4444"
+        spread={72}
+        swirl={0.6}
+        tail={0.5}
+        trail={0.65}
+        wander={0.5}
+        depth={0.7}
+        clickEffect="burst"
+        idle="hide"
+        lightMode
+      />
       {/* Direct Interview Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
@@ -668,8 +688,14 @@ export default function App() {
         />
         {/* Desktop Header Nav */}
         <nav className="hidden md:flex relative z-20 pointer-events-auto px-6 py-5 justify-between items-center text-slate-900 bg-white/75 backdrop-blur-md border-b border-slate-900/10 shadow-sm transition-all">
-          <a href="#" className="flex items-center space-x-2.5 group">
-            <span className="text-xl font-black tracking-tight text-[#581C24]">SAKSHI</span>
+          <a href="#" aria-label="Sakshi Home" className="flex items-center group">
+            <span className="w-9 h-9 rounded-full overflow-hidden border border-[#581C24]/20 bg-white shadow-sm shrink-0 flex items-center justify-center">
+              <img
+                src="/assets/aistudio/SJ_logo_on_white_background_e8dc6e80_17e10099.jpg"
+                alt="SJ Logo"
+                className="w-full h-full object-cover scale-125"
+              />
+            </span>
           </a>
           
           {/* Desktop Navigation Links */}
@@ -702,7 +728,16 @@ export default function App() {
         {/* Mobile BubbleMenu */}
         <div className="md:hidden pointer-events-auto">
           <BubbleMenu 
-            logo={<span className="font-extrabold text-xs sm:text-sm tracking-tight text-[#581C24] uppercase">SAKSHI</span>}
+            logo={
+              <span className="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm tracking-tight text-[#581C24] uppercase">
+                <img
+                  src="/assets/aistudio/SJ_logo_on_white_background_e8dc6e80_17e10099.jpg"
+                  alt="SJ Logo"
+                  className="w-6 h-6 rounded-full object-cover scale-110 border border-[#581C24]/20"
+                />
+                <span>SAKSHI</span>
+              </span>
+            }
             items={[
               {
                 label: 'The Proof',
