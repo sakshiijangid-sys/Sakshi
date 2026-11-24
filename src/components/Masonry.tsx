@@ -14,6 +14,8 @@ export interface MasonryItem {
   desc?: string;
   badge?: string;
   stack?: string[];
+  imageFit?: 'cover' | 'contain';
+  bgColor?: string;
   [key: string]: any;
 }
 
@@ -350,7 +352,14 @@ export const Masonry: React.FC<MasonryProps> = ({
             onMouseEnter={e => handleMouseEnter(e, item)}
             onMouseLeave={e => handleMouseLeave(e, item)}
           >
-            <div className="masonry-item-img" style={{ backgroundImage: `url(${item.img})` }}>
+            <div
+              className="masonry-item-img"
+              style={{
+                backgroundImage: `url(${item.img})`,
+                ...(item.imageFit ? { backgroundSize: item.imageFit } : {}),
+                ...(item.bgColor ? { backgroundColor: item.bgColor } : {})
+              }}
+            >
               {colorShiftOnHover && (
                 <div
                   className="color-overlay"
@@ -368,20 +377,23 @@ export const Masonry: React.FC<MasonryProps> = ({
                 />
               )}
 
-              {(item.title || item.desc || item.badge) && (
-                <div className="masonry-item-content">
+              {item.title && (
+                <div className="absolute top-0 inset-x-0 z-10 px-4 pt-3.5 pb-4 bg-gradient-to-b from-white/95 via-white/80 to-transparent pointer-events-none">
+                  <h4 className="font-bold text-sm sm:text-base text-[#1C1917] tracking-tight leading-snug truncate">
+                    {item.title}
+                  </h4>
+                </div>
+              )}
+
+              {(item.desc || item.badge || (item.stack && item.stack.length > 0)) && (
+                <div className="masonry-item-content z-20">
                   {item.badge && (
                     <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[#E07A5F] mb-1">
                       {item.badge}
                     </span>
                   )}
-                  {item.title && (
-                    <h5 className="font-bold text-sm text-white leading-tight mb-1">
-                      {item.title}
-                    </h5>
-                  )}
                   {item.desc && (
-                    <p className="text-xs text-stone-300 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-stone-200 line-clamp-2 leading-relaxed">
                       {item.desc}
                     </p>
                   )}

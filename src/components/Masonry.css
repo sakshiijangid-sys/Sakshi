@@ -23,13 +23,14 @@
   height: 100%;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0px 12px 40px -10px rgba(20, 13, 17, 0.16);
+  box-shadow: none;
   border: 1px solid rgba(220, 215, 210, 0.5);
-  transition: box-shadow 0.3s ease;
+  transition: border-color 0.3s ease;
 }
 
 .masonry-item-wrapper:hover > .masonry-item-img {
-  box-shadow: 0px 20px 50px -10px rgba(140, 45, 64, 0.25);
+  box-shadow: none;
+  border-color: rgba(140, 45, 64, 0.35);
 }
 
 .masonry-item-content {

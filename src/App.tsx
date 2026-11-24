@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import TrueFocus from "./components/TrueFocus";
 import GradualBlur from "./components/GradualBlur";
-import ScrollVelocity from "./components/ScrollVelocity";
+import { CardStack, type CardStackItem } from "./components/ui/card-stack";
 import SpecularButton from "./components/SpecularButton";
 import BubbleMenu from "./components/BubbleMenu";
 import BlurText from "./components/BlurText";
@@ -15,10 +15,6 @@ import FlowerCTAWrapper from "./components/FlowerClusterPopup";
 import ParticleText from "./components/ParticleText";
 import GlassAssembly from "./components/GlassAssembly";
 import Masonry from "./components/Masonry";
-import soloLevelingImg from "./assets/images/solo_leveling_system_1795336680643.jpg";
-import infixClothingImg from "./assets/images/infix_premium_clothing_1795336680522.jpg";
-import cookbookPlannerImg from "./assets/images/cookbook_recipe_planner_1795336682038.jpg";
-import floralSpectrumImg from "./assets/images/floral_spectrum_botany_1795336681487.jpg";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -28,7 +24,6 @@ import {
   ExternalLink, 
   ChevronUp,
   X,
-  Plus,
   Send,
   Calendar,
   ArrowRight,
@@ -45,9 +40,9 @@ gsap.registerPlugin(ScrollTrigger);
 const UNPUBLISHED_PROJECTS = [
   {
     id: 1,
-    name: "AI Content Generator",
-    description: "An experimental full-stack AI content studio providing rapid prompt engineering, real-time generation pipelines, and multi-format document exports.",
-    mainImg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=500",
+    name: "Infix",
+    description: "A creative streetwear and DIY clothing storefront concept exploring modular garment customization and editorial lookbook layouts.",
+    mainImg: "https://i.pinimg.com/736x/43/4e/94/434e9422da4800c264bb84c0a6c592b6.jpg",
     gallery: [
       "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1676299081847-824916de030a?auto=format&fit=crop&q=80&w=800",
@@ -57,9 +52,9 @@ const UNPUBLISHED_PROJECTS = [
   },
   {
     id: 2,
-    name: "Crypto Dashboard",
-    description: "A real-time cryptocurrency analytics platform with live market data feeds, interactive portfolio tracking, and automated risk indicators.",
-    mainImg: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=1000",
+    name: "Homaker",
+    description: "An architectural home planning and living-space discovery prototype combining curated interiors with interactive layout previews.",
+    mainImg: "https://i.pinimg.com/736x/04/41/4e/04414e1ec1ce7b787899ffbf5256fca1.jpg",
     gallery: [
       "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1621761191319-c6fb62004009?auto=format&fit=crop&q=80&w=800",
@@ -69,9 +64,9 @@ const UNPUBLISHED_PROJECTS = [
   },
   {
     id: 3,
-    name: "Health Tracker",
-    description: "A privacy-first health metrics dashboard tracking daily activity, biometric analytics, and personalized wellness goals.",
-    mainImg: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80&w=500",
+    name: "Inspirova",
+    description: "A Pinterest-style visual discovery platform crafted for artists to collect sketching references, studies, and curated moodboards.",
+    mainImg: "https://i.pinimg.com/736x/2b/db/49/2bdb494c326e66846293cecafe4273b2.jpg",
     gallery: [
       "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1505751172107-573957a243b0?auto=format&fit=crop&q=80&w=800",
@@ -81,9 +76,9 @@ const UNPUBLISHED_PROJECTS = [
   },
   {
     id: 4,
-    name: "Real Estate App",
-    description: "A modern property search platform featuring high-resolution interactive map overlays, filterable listings, and instant virtual tour scheduling.",
-    mainImg: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=500",
+    name: "Fairy-Topia",
+    description: "An illustrated interactive fantasy realm prototype blending atmospheric motion design, character lore, and storybook exploration.",
+    mainImg: "https://i.pinimg.com/736x/03/85/18/03851844e7e77c3e605cbd93cf8d2a60.jpg",
     gallery: [
       "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=800",
@@ -93,9 +88,37 @@ const UNPUBLISHED_PROJECTS = [
   }
 ];
 
+const CREDENTIAL_STACK_ITEMS: CardStackItem[] = [
+  {
+    id: "tcs-ion-career-edge",
+    title: "TCS iON Career Edge – Young Professional Certificate",
+    imageSrc: "/assets/aistudio/image_547bbe76.png",
+  },
+  {
+    id: "infosys-mern-fsd",
+    title: "Infosys Springboard – The MERN Stack & FSD Certificate",
+    imageSrc: "/assets/aistudio/image_c43bd471.png",
+  },
+  {
+    id: "skill-india-genai",
+    title: "Skill India NSDC – Introduction on Generative AI Certificate",
+    imageSrc: "/assets/aistudio/image_b77d7918.png",
+  },
+  {
+    id: "reliance-frontend-dev",
+    title: "Reliance Foundation – Front-end Web Development Certificate",
+    imageSrc: "/assets/aistudio/image_b89e97f9.png",
+  },
+  {
+    id: "flyrank-ai-fluency",
+    title: "FlyRank AI – AI Fluency Internship Certificate",
+    imageSrc: "/assets/aistudio/image_c5d43003.png",
+  },
+];
+
 interface ProofItem {
   title: string;
-  badge: string;
+  badge?: string;
   rawImg: string;
   enhancedImg: string;
   rawText: string;
@@ -105,6 +128,7 @@ interface ProofItem {
 function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const cardUid = useId().replace(/:/g, "");
 
   useEffect(() => {
     // Auto-flip after 4.5 seconds when hovering over the raw front card
@@ -121,79 +145,245 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
       onClick={() => setIsFlipped(!isFlipped)} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="flip-card-container group h-[430px] w-full select-none cursor-pointer"
+      className="flip-card-container group h-[430px] sm:h-[440px] w-full select-none cursor-pointer"
     >
       <div className={`flip-card rounded-3xl shadow-2xl ${isFlipped ? 'is-flipped' : ''}`}>
         
         {/* FRONT CARD: RAW AI OUTPUT */}
-        <div className="flip-card-front rounded-3xl overflow-hidden border border-rose-900/40 bg-slate-950 flex flex-col justify-between p-6 shadow-2xl relative">
-          {/* Background Image: Raw AI Draft - Clean & Visible */}
-          <img 
-            src={item.rawImg} 
-            alt={`${item.title} Raw AI Draft`} 
-            className="absolute inset-0 w-full h-full object-cover brightness-95 contrast-105 group-hover:scale-105 transition-transform duration-700"
-            referrerPolicy="no-referrer"
-          />
-          {/* Subtle Bottom Gradient Overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-slate-950/10 pointer-events-none" />
+        <div className="flip-card-front rounded-3xl overflow-hidden border border-rose-900/40 bg-[#1A080D] flex flex-col shadow-2xl relative">
+          {/* Top/Main Image Frame: Unobstructed with curvy top wave border */}
+          <div className="relative flex-1 overflow-hidden">
+            <img 
+              src={item.rawImg} 
+              alt={`${item.title} Raw AI Draft`} 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              referrerPolicy="no-referrer"
+            />
 
-          {/* Header Badge */}
-          <div className="relative z-10 flex items-center justify-between">
-            <span className="inline-flex items-center space-x-1.5 bg-rose-950/80 border border-rose-700/60 text-rose-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-lg">
-              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
-              <span>Raw AI Output</span>
-            </span>
-          </div>
-
-          {/* Content Body: Popup Box arrives above title at the bottom */}
-          <div className="relative z-10 mt-auto flex flex-col justify-end space-y-2">
-            {/* Popup Issue Text Box on Hover - transparent background */}
-            <div className="opacity-0 translate-y-4 scale-95 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300 ease-out py-1 px-0.5 text-rose-100 text-xs md:text-sm leading-relaxed drop-shadow-md">
-              <span className="font-extrabold uppercase text-[10px] text-rose-300 block mb-0.5 tracking-wider">
-                Raw Output Issues:
-              </span>
-              {item.rawText}
+            {/* Upper Layered Curvy Wave Border (matching #proof section wave dividers) */}
+            <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none -translate-y-[1px]">
+              <svg
+                className="relative block w-full h-11"
+                viewBox="0 0 400 44"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <filter id={`cardTopBlurFront-${cardUid}`} x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="2.5" />
+                  </filter>
+                  <linearGradient id={`cardTopGrad1Front-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8C2D40" stopOpacity="0.88" />
+                    <stop offset="50%" stopColor="#E07A5F" stopOpacity="0.7" />
+                    <stop offset="100%" stopColor="#6B1D2F" stopOpacity="0.88" />
+                  </linearGradient>
+                  <linearGradient id={`cardTopGrad2Front-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="50%">
+                    <stop offset="0%" stopColor="#E07A5F" stopOpacity="0.82" />
+                    <stop offset="100%" stopColor="#8C2D40" stopOpacity="0.65" />
+                  </linearGradient>
+                  <linearGradient id={`cardTopGrad3Front-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6B1D2F" stopOpacity="0.92" />
+                    <stop offset="100%" stopColor="#3D121B" stopOpacity="0.85" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0,0 L400,0 L400,36 C333,7 266,43 200,23 C133,3 66,36 0,14 Z"
+                  fill={`url(#cardTopGrad1Front-${cardUid})`}
+                  filter={`url(#cardTopBlurFront-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,30 C333,10 266,36 200,20 C133,4 66,30 0,11 Z"
+                  fill={`url(#cardTopGrad1Front-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,22 C320,40 236,7 153,28 C78,44 33,14 0,25 Z"
+                  fill={`url(#cardTopGrad2Front-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,11 C305,27 222,4 125,20 C70,30 28,7 0,14 Z"
+                  fill={`url(#cardTopGrad3Front-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,15 C305,34 208,6 111,26 C55,36 22,15 0,18 Z"
+                  fill="#1A080D"
+                />
+              </svg>
             </div>
 
-            {/* Main Title placed at the bottom */}
-            <h4 className="text-xl xl:text-2xl font-bold text-white tracking-tight drop-shadow-md">
+            <div className="absolute top-11 left-3.5 z-10">
+              <span className="inline-flex items-center space-x-1.5 bg-rose-950/85 border border-rose-700/60 text-rose-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+                <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+                <span>Raw AI Output</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Caption Bar with Curvy Top Wave Transition + Hover Details */}
+          <div className="relative z-10 shrink-0 bg-[#1A080D] px-5 pt-2 pb-3.5">
+            <div className="absolute -top-5 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-10 translate-y-[1px]">
+              <svg className="relative block w-full h-5" viewBox="0 0 400 22" preserveAspectRatio="none">
+                <path
+                  d="M0,22 L400,22 L400,6 C315,18 225,2 140,13 C75,21 30,5 0,10 Z"
+                  fill="#8C2D40"
+                  fillOpacity="0.65"
+                />
+                <path
+                  d="M0,22 L400,22 L400,10 C315,20 225,5 140,15 C75,22 30,8 0,13 Z"
+                  fill="#1A080D"
+                />
+              </svg>
+            </div>
+
+            <div
+              className="absolute bottom-full left-0 right-0 z-[5] bg-[#6B1D2F]/65 backdrop-blur-md px-5 pt-6 pb-6 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out pointer-events-none"
+              style={{
+                maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 140' preserveAspectRatio='none'%3E%3Cpath d='M0,16 C65,28 130,3 210,14 C290,25 345,4 400,12 L400,140 L0,140 Z' fill='black'/%3E%3C/svg%3E")`,
+                WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 140' preserveAspectRatio='none'%3E%3Cpath d='M0,16 C65,28 130,3 210,14 C290,25 345,4 400,12 L400,140 L0,140 Z' fill='black'/%3E%3C/svg%3E")`,
+                maskSize: '100% 100%',
+                WebkitMaskSize: '100% 100%',
+              }}
+            >
+              <svg
+                className="absolute top-0 left-0 right-0 w-full h-5 pointer-events-none"
+                viewBox="0 0 400 24"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0,14 C65,24 130,3 210,12 C290,21 345,4 400,10"
+                  fill="none"
+                  stroke="#E07A5F"
+                  strokeOpacity="0.6"
+                  strokeWidth="2.5"
+                />
+              </svg>
+              <span className="font-extrabold uppercase text-[10px] text-rose-200 block mb-0.5 tracking-wider drop-shadow-sm">
+                Raw Output Issues:
+              </span>
+              <p className="text-white text-xs md:text-sm leading-relaxed drop-shadow-sm">
+                {item.rawText}
+              </p>
+            </div>
+
+            <h4 className="relative z-10 text-lg xl:text-xl font-bold text-white tracking-tight truncate">
               {item.title}
             </h4>
           </div>
         </div>
 
         {/* BACK CARD: ENHANCED UI OUTPUT */}
-        <div className="flip-card-back rounded-3xl overflow-hidden border border-emerald-500/50 bg-slate-950 flex flex-col justify-between p-6 shadow-2xl relative">
-          {/* Background Image: Enhanced UI - Clean & Visible */}
-          <img 
-            src={item.enhancedImg} 
-            alt={`${item.title} Enhanced Interface`} 
-            className="absolute inset-0 w-full h-full object-cover brightness-95 contrast-105 group-hover:scale-105 transition-transform duration-700"
-            referrerPolicy="no-referrer"
-          />
-          {/* Subtle Bottom Gradient Overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/40 to-slate-950/10 pointer-events-none" />
+        <div className="flip-card-back rounded-3xl overflow-hidden border border-emerald-500/50 bg-[#1A080D] flex flex-col shadow-2xl relative">
+          {/* Top/Main Image Frame: Unobstructed with curvy top wave border */}
+          <div className="relative flex-1 overflow-hidden">
+            <img 
+              src={item.enhancedImg} 
+              alt={`${item.title} Enhanced Interface`} 
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              referrerPolicy="no-referrer"
+            />
 
-          {/* Header Badge */}
-          <div className="relative z-10 flex items-center justify-between">
-            <span className="inline-flex items-center space-x-1.5 bg-emerald-950/80 border border-emerald-600/60 text-emerald-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-lg">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Enhanced UI</span>
-            </span>
-          </div>
-
-          {/* Content Body: Popup Box arrives above title at the bottom */}
-          <div className="relative z-10 mt-auto flex flex-col justify-end space-y-2">
-            {/* Popup Refactored Text Box on Hover - transparent background */}
-            <div className="opacity-0 translate-y-4 scale-95 group-hover:opacity-100 group-hover:translate-y-0 group-hover:scale-100 transition-all duration-300 ease-out py-1 px-0.5 text-emerald-100 text-xs md:text-sm leading-relaxed drop-shadow-md">
-              <span className="font-extrabold uppercase text-[10px] text-emerald-300 block mb-0.5 tracking-wider">
-                My Refactored Enhancements:
-              </span>
-              {item.enhancedText}
+            {/* Upper Layered Curvy Wave Border (matching #proof section wave dividers) */}
+            <div className="absolute top-0 left-0 right-0 w-full overflow-hidden leading-none z-10 pointer-events-none -translate-y-[1px]">
+              <svg
+                className="relative block w-full h-11"
+                viewBox="0 0 400 44"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <filter id={`cardTopBlurBack-${cardUid}`} x="-10%" y="-10%" width="120%" height="120%">
+                    <feGaussianBlur stdDeviation="2.5" />
+                  </filter>
+                  <linearGradient id={`cardTopGrad1Back-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8C2D40" stopOpacity="0.88" />
+                    <stop offset="50%" stopColor="#E07A5F" stopOpacity="0.7" />
+                    <stop offset="100%" stopColor="#6B1D2F" stopOpacity="0.88" />
+                  </linearGradient>
+                  <linearGradient id={`cardTopGrad2Back-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="50%">
+                    <stop offset="0%" stopColor="#E07A5F" stopOpacity="0.82" />
+                    <stop offset="100%" stopColor="#8C2D40" stopOpacity="0.65" />
+                  </linearGradient>
+                  <linearGradient id={`cardTopGrad3Back-${cardUid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6B1D2F" stopOpacity="0.92" />
+                    <stop offset="100%" stopColor="#3D121B" stopOpacity="0.85" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0,0 L400,0 L400,36 C333,7 266,43 200,23 C133,3 66,36 0,14 Z"
+                  fill={`url(#cardTopGrad1Back-${cardUid})`}
+                  filter={`url(#cardTopBlurBack-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,30 C333,10 266,36 200,20 C133,4 66,30 0,11 Z"
+                  fill={`url(#cardTopGrad1Back-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,22 C320,40 236,7 153,28 C78,44 33,14 0,25 Z"
+                  fill={`url(#cardTopGrad2Back-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,11 C305,27 222,4 125,20 C70,30 28,7 0,14 Z"
+                  fill={`url(#cardTopGrad3Back-${cardUid})`}
+                />
+                <path
+                  d="M0,0 L400,0 L400,15 C305,34 208,6 111,26 C55,36 22,15 0,18 Z"
+                  fill="#1A080D"
+                />
+              </svg>
             </div>
 
-            {/* Main Title placed at the bottom */}
-            <h4 className="text-xl xl:text-2xl font-bold text-white tracking-tight drop-shadow-md">
+            <div className="absolute top-11 left-3.5 z-10">
+              <span className="inline-flex items-center space-x-1.5 bg-emerald-950/85 border border-emerald-600/60 text-emerald-200 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider backdrop-blur-md shadow-md">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Enhanced UI</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Caption Bar with Curvy Top Wave Transition + Hover Details */}
+          <div className="relative z-10 shrink-0 bg-[#1A080D] px-5 pt-2 pb-3.5">
+            <div className="absolute -top-5 left-0 right-0 w-full overflow-hidden leading-none pointer-events-none z-10 translate-y-[1px]">
+              <svg className="relative block w-full h-5" viewBox="0 0 400 22" preserveAspectRatio="none">
+                <path
+                  d="M0,22 L400,22 L400,6 C315,18 225,2 140,13 C75,21 30,5 0,10 Z"
+                  fill="#8C2D40"
+                  fillOpacity="0.65"
+                />
+                <path
+                  d="M0,22 L400,22 L400,10 C315,20 225,5 140,15 C75,22 30,8 0,13 Z"
+                  fill="#1A080D"
+                />
+              </svg>
+            </div>
+
+            <div
+              className="absolute bottom-full left-0 right-0 z-[5] bg-[#6B1D2F]/65 backdrop-blur-md px-5 pt-6 pb-6 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 ease-out pointer-events-none"
+              style={{
+                maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 140' preserveAspectRatio='none'%3E%3Cpath d='M0,16 C65,28 130,3 210,14 C290,25 345,4 400,12 L400,140 L0,140 Z' fill='black'/%3E%3C/svg%3E")`,
+                WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 140' preserveAspectRatio='none'%3E%3Cpath d='M0,16 C65,28 130,3 210,14 C290,25 345,4 400,12 L400,140 L0,140 Z' fill='black'/%3E%3C/svg%3E")`,
+                maskSize: '100% 100%',
+                WebkitMaskSize: '100% 100%',
+              }}
+            >
+              <svg
+                className="absolute top-0 left-0 right-0 w-full h-5 pointer-events-none"
+                viewBox="0 0 400 24"
+                preserveAspectRatio="none"
+              >
+                <path
+                  d="M0,14 C65,24 130,3 210,12 C290,21 345,4 400,10"
+                  fill="none"
+                  stroke="#E07A5F"
+                  strokeOpacity="0.6"
+                  strokeWidth="2.5"
+                />
+              </svg>
+              <span className="font-extrabold uppercase text-[10px] text-emerald-200 block mb-0.5 tracking-wider drop-shadow-sm">
+                My Refactored Enhancements:
+              </span>
+              <p className="text-white text-xs md:text-sm leading-relaxed drop-shadow-sm">
+                {item.enhancedText}
+              </p>
+            </div>
+
+            <h4 className="relative z-10 text-lg xl:text-xl font-bold text-white tracking-tight truncate">
               {item.title}
             </h4>
           </div>
@@ -213,6 +403,27 @@ export default function App() {
   const [interviewMessage, setInterviewMessage] = useState("Hi Sakshi,\n\nI am a Tech Lead looking for someone to ship full-stack features rapidly. Your portfolio caught my attention. Let's schedule a 20-minute intro call.");
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVideoMuted, setIsVideoMuted] = useState(false);
+  const [stackDimensions, setStackDimensions] = useState<{ width: number; height: number }>(() => {
+    if (typeof window === "undefined") return { width: 500, height: 355 };
+    if (window.innerWidth < 640) return { width: 280, height: 200 };
+    if (window.innerWidth < 1024) return { width: 420, height: 300 };
+    return { width: 500, height: 355 };
+  });
+
+  useEffect(() => {
+    const updateStackDimensions = () => {
+      if (window.innerWidth < 640) {
+        setStackDimensions({ width: 280, height: 200 });
+      } else if (window.innerWidth < 1024) {
+        setStackDimensions({ width: 420, height: 300 });
+      } else {
+        setStackDimensions({ width: 500, height: 355 });
+      }
+    };
+    updateStackDimensions();
+    window.addEventListener("resize", updateStackDimensions);
+    return () => window.removeEventListener("resize", updateStackDimensions);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -769,28 +980,25 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 [&>*:last-child]:md:col-span-2 [&>*:last-child]:lg:col-span-1">
               {[
                 {
-                  title: "Analytics & Performance Dashboard",
-                  badge: "Data Density & Hierarchy",
-                  rawImg: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=1000",
-                  enhancedImg: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000",
-                  rawText: "Overcrowded chart dump with raw unformatted numbers, zero visual contrast, and unaligned metric cards.",
-                  enhancedText: "Structured grid layout with distinct typographic hierarchy, clear KPI focus cards, and responsive chart containers."
+                  title: "Appropriate fonts and visuals",
+                  rawImg: "/assets/aistudio/Untitled6_20261122233208_4e01f8dd.png",
+                  enhancedImg: "/assets/aistudio/Untitled6_20261122233756_398a7fc8.png",
+                  rawText: "No text styling, blank footer and no images on cards make it difficult to identify flowers.",
+                  enhancedText: "Personally selected and uploaded flower images on cards and added navbar and footer styling."
                 },
                 {
-                  title: "SaaS Billing & Pricing Engine",
-                  badge: "Conversion & Micro-Interactions",
-                  rawImg: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000",
-                  enhancedImg: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000",
-                  rawText: "Static pricing table with wrapped button labels, uncentered column heights, and raw unstyled forms.",
-                  enhancedText: "Interactive billing toggle, highlighted value plan, mathematical border-radius, and seamless checkout state transitions."
+                  title: "Bookish theme on literature",
+                  rawImg: "/assets/aistudio/Untitled6_20261123001246_c2e05229.png",
+                  enhancedImg: "/assets/aistudio/Untitled6_20261123001526_c25c93c8.png",
+                  rawText: "Generic elements styling with no unique identity, although having sloppy structure.",
+                  enhancedText: "Created a book-style website design with artistic visuals and more interactive simulations."
                 },
                 {
-                  title: "Mobile-First App Onboarding Flow",
-                  badge: "Fluid Touch Targets & UX",
-                  rawImg: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?auto=format&fit=crop&q=80&w=1000",
-                  enhancedImg: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=1000",
-                  rawText: "Desktop-first fixed width layout causing horizontal scrolling and sub-44px touch targets on mobile screens.",
-                  enhancedText: "Adaptive mobile viewport layout, 48px+ touch targets, smooth slide transitions, and clear progress steppers."
+                  title: "Dark and light theme toggle",
+                  rawImg: "/assets/aistudio/Untitled6_20261122235425_e7970fea.png",
+                  enhancedImg: "/assets/aistudio/Untitled6_20261123000021_bec228d7.png",
+                  rawText: "A task management platform with simple styling and minimal animations having different styles on different pages.",
+                  enhancedText: "Implemented smooth theme toggle, inhanced assistant appearance and kept minecraft theme throughout the website."
                 }
               ].map((item, idx) => (
                 <ProofFlipCard key={idx} item={item} />
@@ -820,43 +1028,47 @@ export default function App() {
               items={[
                 {
                   id: "pub-1",
-                  img: soloLevelingImg,
+                  img: "/assets/aistudio/Untitled7_20261123011958_538ac064.png",
                   url: "https://solo-leveling-system-xi.vercel.app",
                   height: 540,
                   title: "Solo Leveling System",
-                  badge: "GAMIFIED LEARNING",
                   desc: "A gamified task management and learning platform featuring XP progression, daily quests, and adaptive study workflows.",
-                  stack: ["React", "Firebase", "Gemini API"]
+                  stack: ["React", "Firebase", "Gemini API"],
+                  imageFit: "contain",
+                  bgColor: "#ffffff"
                 },
                 {
                   id: "pub-2",
-                  img: infixClothingImg,
+                  img: "/assets/aistudio/Untitled7_20261123011439_0b364adf.png",
                   url: "https://example.com/infix-clothing",
                   height: 540,
-                  title: "Infix - Premium Clothing",
-                  badge: "DIY APPAREL STOREFRONT",
-                  desc: "A luxury e-commerce storefront crafted for bespoke DIY apparel and creative streetwear drops with custom order flows.",
-                  stack: ["React", "Firebase", "Razorpay"]
+                  title: "Election Explorer",
+                  desc: "A useful website for individuals which are trying to understand elections and are first time voters via a simulation.",
+                  stack: ["React", "Firebase"],
+                  imageFit: "contain",
+                  bgColor: "#ffffff"
                 },
                 {
                   id: "pub-3",
-                  img: cookbookPlannerImg,
-                  url: "https://example.com/cookbook-planner",
+                  img: "/assets/aistudio/Untitled7_20261123005155_2617deeb.png",
+                  url: "https://cook-book-psi.vercel.app",
                   height: 560,
                   title: "Cookbook - Recipe Book & Planner",
-                  badge: "CULINARY & NUTRITION",
                   desc: "A curated recipe library and weekly meal planner equipped with an interactive macro and nutrition evaluator.",
-                  stack: ["TypeScript", "React", "Gemini API"]
+                  stack: ["TypeScript", "React", "Gemini API"],
+                  imageFit: "contain",
+                  bgColor: "#ffffff"
                 },
                 {
                   id: "pub-4",
-                  img: floralSpectrumImg,
+                  img: "/assets/aistudio/Untitled7_20261123010249_d4fc6863.png",
                   url: "https://floral-spectrum.vercel.app",
                   height: 560,
                   title: "Floral Spectrum",
-                  badge: "BOTANICAL ARCHIVE",
                   desc: "An interactive botanical reference platform built for botanists to explore rare species, taxonomy, and floral traits.",
-                  stack: ["React", "TailwindCSS"]
+                  stack: ["React", "TailwindCSS"],
+                  imageFit: "contain",
+                  bgColor: "#ffffff"
                 }
               ]}
               ease="power3.out"
@@ -888,7 +1100,6 @@ export default function App() {
                     referrerPolicy="no-referrer" 
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center pointer-events-none">
-                    <Plus className="text-white mb-1 drop-shadow-md" size={24} />
                     <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{project.name}</p>
                   </div>
                 </div>
@@ -1029,48 +1240,31 @@ export default function App() {
           </p>
         </div>
 
-        <div className="w-full">
-          <ScrollVelocity
-            velocity={35}
-            numCopies={4}
-            draggable={true}
-            texts={[
-              <div className="flex items-stretch gap-6 py-4 pr-6" key="cert-cards">
-                {[
-                  {
-                    title: "Full Stack Web Development (MERN)",
-                    desc: "Comprehensive mastery of full-stack engineering including React.js, Node.js, Express.js, MongoDB database modeling, RESTful API design, and client-server state management."
-                  },
-                  {
-                    title: "Node.js & Backend Architecture",
-                    desc: "Specialized in event loop asynchronous performance, REST API routing, runtime schema validation with Zod, database ORM integration, and server-side security checks."
-                  },
-                  {
-                    title: "Generative AI & AI-Accelerated Development",
-                    desc: "Certified in leveraging Gemini AI APIs, prompt optimization, rapid application prototyping, and rigorous line-by-line manual code auditing for production readiness."
-                  },
-                  {
-                    title: "Professional Frontend Developer",
-                    desc: "Advanced proficiency in modular React component architecture, custom hooks, TypeScript interfaces, Tailwind CSS design systems, and responsive UX optimization."
-                  }
-                ].map((cert, i) => (
-                  <div 
-                    key={i} 
-                    className="w-[280px] sm:w-[350px] md:w-[380px] bg-[#FDFBF7] p-6 md:p-8 rounded-3xl border border-stone-200 shadow-sm hover:shadow-xl hover:border-[#6B1D2F]/40 transition-all flex flex-col justify-between shrink-0 group whitespace-normal text-left"
-                  >
-                    <div>
-                      <h3 className="text-lg md:text-xl font-bold text-[#1C1917] mb-3 leading-snug">
-                        {cert.title}
-                      </h3>
-
-                      <p className="text-stone-600 leading-relaxed font-medium text-xs md:text-sm">
-                        {cert.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+        <div className="w-full px-4 sm:px-6 md:px-12 pt-4 pb-2">
+          <CardStack
+            items={CREDENTIAL_STACK_ITEMS}
+            initialIndex={0}
+            maxVisible={5}
+            cardWidth={stackDimensions.width}
+            cardHeight={stackDimensions.height}
+            overlap={0.48}
+            spreadDeg={42}
+            depthPx={130}
+            autoAdvance
+            intervalMs={2600}
+            pauseOnHover
+            showDots
+            renderCard={(item) => (
+              <div className="h-full w-full overflow-hidden bg-white">
+                <img
+                  src={item.imageSrc}
+                  alt={item.title}
+                  className="h-full w-full object-contain"
+                  draggable={false}
+                  loading="eager"
+                />
               </div>
-            ]}
+            )}
           />
         </div>
       </section>
