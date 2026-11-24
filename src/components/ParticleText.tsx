@@ -138,6 +138,7 @@ const ParticleText: React.FC<ParticleTextProps> = ({
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let isInView = false;
 
     const pointer = {
       active: false,
@@ -243,11 +244,15 @@ const ParticleText: React.FC<ParticleTextProps> = ({
         gathering = false;
       }
 
-      animationFrame = window.requestAnimationFrame(render);
+      if (isInView && !document.hidden) {
+        animationFrame = window.requestAnimationFrame(render);
+      } else {
+        animationFrame = null;
+      }
     };
 
     const ensureRenderLoop = () => {
-      if (animationFrame === null) {
+      if (animationFrame === null && isInView && !document.hidden) {
         animationFrame = window.requestAnimationFrame(render);
       }
     };
@@ -390,16 +395,21 @@ const ParticleText: React.FC<ParticleTextProps> = ({
 
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasGatheredOnScroll) {
+        isInView = entries.some((entry) => entry.isIntersecting);
+        if (isInView) {
+          if (!hasGatheredOnScroll) {
             hasGatheredOnScroll = true;
             if (particles.length > 0 && !reducedMotion) {
               startGather(true);
             }
           }
-        });
+          ensureRenderLoop();
+        } else if (animationFrame !== null) {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = null;
+        }
       },
-      { threshold: 0.15 }
+      { threshold: 0.05 }
     );
 
     intersectionObserver.observe(container);

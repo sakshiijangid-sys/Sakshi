@@ -3,22 +3,26 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useId, useRef, useState } from "react";
 import TrueFocus from "./components/TrueFocus";
 import GradualBlur from "./components/GradualBlur";
-import { CardStack, type CardStackItem } from "./components/ui/card-stack";
+import type { CardStackItem } from "./components/ui/card-stack";
 import SpecularButton from "./components/SpecularButton";
 import BubbleMenu from "./components/BubbleMenu";
 import BlurText from "./components/BlurText";
-import OptionWheel from "./components/OptionWheel";
 import FlowerCTAWrapper from "./components/FlowerClusterPopup";
-import ParticleText from "./components/ParticleText";
-import GlassAssembly from "./components/GlassAssembly";
-import Masonry from "./components/Masonry";
-import SwarmCursor from "./components/SwarmCursor";
+import Masonry, { type MasonryItem } from "./components/Masonry";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+
+const CardStack = lazy(() =>
+  import("./components/ui/card-stack").then((m) => ({ default: m.CardStack }))
+);
+const OptionWheel = lazy(() => import("./components/OptionWheel"));
+const ParticleText = lazy(() => import("./components/ParticleText"));
+const GlassAssembly = lazy(() => import("./components/GlassAssembly"));
+const SwarmCursor = lazy(() => import("./components/SwarmCursor"));
 import { 
   Mail, 
   Linkedin, 
@@ -93,27 +97,27 @@ const CREDENTIAL_STACK_ITEMS: CardStackItem[] = [
   {
     id: "tcs-ion-career-edge",
     title: "TCS iON Career Edge – Young Professional Certificate",
-    imageSrc: "/assets/aistudio/image_547bbe76.png",
+    imageSrc: "/assets/aistudio/opt/image_547bbe76.webp",
   },
   {
     id: "infosys-mern-fsd",
     title: "Infosys Springboard – The MERN Stack & FSD Certificate",
-    imageSrc: "/assets/aistudio/image_c43bd471.png",
+    imageSrc: "/assets/aistudio/opt/image_c43bd471.webp",
   },
   {
     id: "skill-india-genai",
     title: "Skill India NSDC – Introduction on Generative AI Certificate",
-    imageSrc: "/assets/aistudio/image_b77d7918.png",
+    imageSrc: "/assets/aistudio/opt/image_b77d7918.webp",
   },
   {
     id: "reliance-frontend-dev",
     title: "Reliance Foundation – Front-end Web Development Certificate",
-    imageSrc: "/assets/aistudio/image_b89e97f9.png",
+    imageSrc: "/assets/aistudio/opt/image_b89e97f9.webp",
   },
   {
     id: "flyrank-ai-fluency",
     title: "FlyRank AI – AI Fluency Internship Certificate",
-    imageSrc: "/assets/aistudio/image_c5d43003.png",
+    imageSrc: "/assets/aistudio/opt/image_c5d43003.webp",
   },
 ];
 
@@ -125,6 +129,77 @@ interface ProofItem {
   rawText: string;
   enhancedText: string;
 }
+
+const PROOF_ITEMS: ProofItem[] = [
+  {
+    title: "Appropriate fonts and visuals",
+    rawImg: "/assets/aistudio/opt/Untitled6_20261122233208_4e01f8dd.webp",
+    enhancedImg: "/assets/aistudio/opt/Untitled6_20261122233756_398a7fc8.webp",
+    rawText: "No text styling, blank footer and no images on cards make it difficult to identify flowers.",
+    enhancedText: "Personally selected and uploaded flower images on cards and added navbar and footer styling."
+  },
+  {
+    title: "Bookish theme on literature",
+    rawImg: "/assets/aistudio/opt/Untitled6_20261123001246_c2e05229.webp",
+    enhancedImg: "/assets/aistudio/opt/Untitled6_20261123001526_c25c93c8.webp",
+    rawText: "Generic elements styling with no unique identity, although having sloppy structure.",
+    enhancedText: "Created a book-style website design with artistic visuals and more interactive simulations."
+  },
+  {
+    title: "Dark and light theme toggle",
+    rawImg: "/assets/aistudio/opt/Untitled6_20261122235425_e7970fea.webp",
+    enhancedImg: "/assets/aistudio/opt/Untitled6_20261123000021_bec228d7.webp",
+    rawText: "A task management platform with simple styling and minimal animations having different styles on different pages.",
+    enhancedText: "Implemented smooth theme toggle, inhanced assistant appearance and kept minecraft theme throughout the website."
+  }
+];
+
+const PUBLISHED_PROJECTS: MasonryItem[] = [
+  {
+    id: "pub-1",
+    img: "/assets/aistudio/opt/Untitled7_20261123011958_538ac064.webp",
+    url: "https://solo-leveling-system-xi.vercel.app",
+    height: 540,
+    title: "Solo Leveling System",
+    desc: "A gamified task management and learning platform featuring XP progression, daily quests, and adaptive study workflows.",
+    stack: ["React", "Firebase", "Gemini API"],
+    imageFit: "contain",
+    bgColor: "#ffffff"
+  },
+  {
+    id: "pub-2",
+    img: "/assets/aistudio/opt/Untitled7_20261123011439_0b364adf.webp",
+    url: "https://example.com/infix-clothing",
+    height: 540,
+    title: "Election Explorer",
+    desc: "A useful website for individuals which are trying to understand elections and are first time voters via a simulation.",
+    stack: ["React", "Firebase"],
+    imageFit: "contain",
+    bgColor: "#ffffff"
+  },
+  {
+    id: "pub-3",
+    img: "/assets/aistudio/opt/Untitled7_20261123005155_2617deeb.webp",
+    url: "https://cook-book-psi.vercel.app",
+    height: 560,
+    title: "Cookbook - Recipe Book & Planner",
+    desc: "A curated recipe library and weekly meal planner equipped with an interactive macro and nutrition evaluator.",
+    stack: ["TypeScript", "React", "Gemini API"],
+    imageFit: "contain",
+    bgColor: "#ffffff"
+  },
+  {
+    id: "pub-4",
+    img: "/assets/aistudio/opt/Untitled7_20261123010249_d4fc6863.webp",
+    url: "https://floral-spectrum.vercel.app",
+    height: 560,
+    title: "Floral Spectrum",
+    desc: "An interactive botanical reference platform built for botanists to explore rare species, taxonomy, and floral traits.",
+    stack: ["React", "TailwindCSS"],
+    imageFit: "contain",
+    bgColor: "#ffffff"
+  }
+];
 
 function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -143,10 +218,20 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
 
   return (
     <div 
+      role="button"
+      tabIndex={0}
+      aria-pressed={isFlipped}
+      aria-label={`${item.title} — ${isFlipped ? "showing enhanced UI, click to view raw AI output" : "showing raw AI output, click to view enhanced UI"}`}
       onClick={() => setIsFlipped(!isFlipped)} 
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setIsFlipped((f) => !f);
+        }
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="flip-card-container group h-[430px] sm:h-[440px] w-full select-none cursor-pointer"
+      className="flip-card-container group h-[430px] sm:h-[440px] w-full select-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E07A5F] rounded-3xl"
     >
       <div className={`flip-card rounded-3xl shadow-2xl ${isFlipped ? 'is-flipped' : ''}`}>
         
@@ -157,6 +242,8 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
             <img 
               src={item.rawImg} 
               alt={`${item.title} Raw AI Draft`} 
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               referrerPolicy="no-referrer"
             />
@@ -277,6 +364,8 @@ function ProofFlipCard({ item }: { item: ProofItem; key?: React.Key }) {
             <img 
               src={item.enhancedImg} 
               alt={`${item.title} Enhanced Interface`} 
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               referrerPolicy="no-referrer"
             />
@@ -403,7 +492,9 @@ export default function App() {
   const [interviewSubject, setInterviewSubject] = useState("Technical Interview Request - Full Stack Developer");
   const [interviewMessage, setInterviewMessage] = useState("Hi Sakshi,\n\nI am a Tech Lead looking for someone to ship full-stack features rapidly. Your portfolio caught my attention. Let's schedule a 20-minute intro call.");
   const videoRef = useRef<HTMLVideoElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
   const [isVideoMuted, setIsVideoMuted] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const [stackDimensions, setStackDimensions] = useState<{ width: number; height: number }>(() => {
     if (typeof window === "undefined") return { width: 500, height: 355 };
     if (window.innerWidth < 640) return { width: 280, height: 200 };
@@ -434,13 +525,53 @@ export default function App() {
       );
     };
     updateStackDimensions();
-    window.addEventListener("resize", updateStackDimensions);
+    window.addEventListener("resize", updateStackDimensions, { passive: true });
     return () => window.removeEventListener("resize", updateStackDimensions);
   }, []);
 
+  // Show Back-to-Top button only after scrolling past the hero
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setShowBackToTop(window.scrollY > 450);
+        ticking = false;
+      });
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Keyboard Escape + background scroll lock for open modals
+  useEffect(() => {
+    const hasModal = Boolean(selectedProject || showInviteModal);
+    if (!hasModal) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedProject(null);
+        setShowInviteModal(false);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [selectedProject, showInviteModal]);
+
   useEffect(() => {
     const video = videoRef.current;
+    const heroEl = heroSectionRef.current;
     if (!video) return;
+
+    let heroInView = true;
 
     video.muted = false;
     const playPromise = video.play();
@@ -461,7 +592,7 @@ export default function App() {
 
     const handleFirstInteraction = () => {
       const v = videoRef.current;
-      if (v && v.muted) {
+      if (v && v.muted && heroInView) {
         v.muted = false;
         setIsVideoMuted(false);
         v.play().catch(() => {});
@@ -475,7 +606,26 @@ export default function App() {
     window.addEventListener("keydown", handleFirstInteraction, { once: true });
     window.addEventListener("touchstart", handleFirstInteraction, { once: true });
 
+    const heroObserver = heroEl
+      ? new IntersectionObserver(
+          (entries) => {
+            heroInView = entries.some((entry) => entry.isIntersecting);
+            if (heroInView) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          },
+          { threshold: 0.05 }
+        )
+      : null;
+
+    if (heroEl && heroObserver) {
+      heroObserver.observe(heroEl);
+    }
+
     return () => {
+      heroObserver?.disconnect();
       window.removeEventListener("click", handleFirstInteraction);
       window.removeEventListener("keydown", handleFirstInteraction);
       window.removeEventListener("touchstart", handleFirstInteraction);
@@ -551,35 +701,44 @@ export default function App() {
     <div ref={containerRef} className="bg-white text-[#1A1A1A] font-sans antialiased selection:bg-[#966F33] selection:text-white overflow-x-clip w-full max-w-full">
       {/* Global Swarm Cursor Overlay (Desktop mouse views only) */}
       {!isMobileView && (
-        <SwarmCursor
-          globalOverlay
-          hideCursor
-          dotSize={9}
-          count={130}
-          size={2.2}
-          color="#8C2D40"
-          accentColor="#EF4444"
-          spread={72}
-          swirl={0.6}
-          tail={0.5}
-          trail={0.65}
-          wander={0.5}
-          depth={0.7}
-          clickEffect="burst"
-          idle="hide"
-          lightMode
-        />
+        <Suspense fallback={null}>
+          <SwarmCursor
+            globalOverlay
+            hideCursor
+            dotSize={9}
+            count={130}
+            size={2.2}
+            color="#8C2D40"
+            accentColor="#EF4444"
+            spread={72}
+            swirl={0.6}
+            tail={0.5}
+            trail={0.65}
+            wander={0.5}
+            depth={0.7}
+            clickEffect="burst"
+            idle="hide"
+            lightMode
+          />
+        </Suspense>
       )}
       {/* Direct Interview Modal */}
       {showInviteModal && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Schedule a Technical Interview"
+        >
           <div 
             className="absolute inset-0 bg-black/80 backdrop-blur-md" 
             onClick={() => setShowInviteModal(false)}
           />
-          <div className="modal-content relative bg-white w-full max-w-2xl overflow-y-auto rounded-3xl p-8 md:p-10 shadow-2xl border border-gray-100">
+          <div className="modal-content relative bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-8 md:p-10 shadow-2xl border border-gray-100">
             <button 
+              type="button"
               onClick={() => setShowInviteModal(false)}
+              aria-label="Close interview invite modal"
               className="absolute top-6 right-6 p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500"
             >
               <X size={28} />
@@ -647,14 +806,21 @@ export default function App() {
 
       {/* Project Gallery Modal */}
       {selectedProject && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${selectedProject.name} Gallery`}
+        >
           <div 
             className="absolute inset-0 bg-stone-950/60 backdrop-blur-md transition-opacity" 
             onClick={() => setSelectedProject(null)}
           />
           <div className="modal-content relative bg-white/85 backdrop-blur-xl border border-white/60 w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-3xl p-8 md:p-12 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)]">
             <button 
+              type="button"
               onClick={() => setSelectedProject(null)}
+              aria-label="Close project gallery"
               className="absolute top-6 right-6 p-2.5 bg-stone-100/60 hover:bg-stone-200/80 rounded-full transition-colors border border-stone-200/50 text-stone-700"
             >
               <X size={28} />
@@ -705,8 +871,11 @@ export default function App() {
           <a href="#" aria-label="Sakshi Home" className="flex items-center group">
             <span className="w-9 h-9 rounded-full overflow-hidden border border-[#581C24]/20 bg-white shadow-sm shrink-0 flex items-center justify-center">
               <img
-                src="/assets/aistudio/SJ_logo_on_white_background_e8dc6e80_17e10099.jpg"
+                src="/assets/aistudio/opt/sj_logo.webp"
                 alt="SJ Logo"
+                width={36}
+                height={36}
+                decoding="async"
                 className="w-full h-full object-cover scale-125"
               />
             </span>
@@ -745,8 +914,11 @@ export default function App() {
             logo={
               <span className="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm tracking-tight text-[#581C24] uppercase">
                 <img
-                  src="/assets/aistudio/SJ_logo_on_white_background_e8dc6e80_17e10099.jpg"
+                  src="/assets/aistudio/opt/sj_logo.webp"
                   alt="SJ Logo"
+                  width={24}
+                  height={24}
+                  decoding="async"
                   className="w-6 h-6 rounded-full object-cover scale-110 border border-[#581C24]/20"
                 />
                 <span>SAKSHI</span>
@@ -799,7 +971,7 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-0 px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 overflow-hidden bg-[#C3C5C2]">
+      <section ref={heroSectionRef} className="relative pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-0 px-5 sm:px-8 md:px-12 lg:px-16 xl:px-20 overflow-hidden bg-[#C3C5C2]">
         {/* Responsive Background Video (Starts cleanly below fixed header so upper part is never hidden; anchored right-bottom) */}
         <div className="absolute top-[68px] md:top-[76px] bottom-0 left-0 right-0 z-0 overflow-hidden pointer-events-none bg-[#C3C5C2]">
           {/* Seamless left-side white bottom wave extension matched proportionally to video height at every breakpoint */}
@@ -819,10 +991,12 @@ export default function App() {
             loop
             muted={isVideoMuted}
             playsInline
+            preload="auto"
+            poster="/assets/aistudio/opt/hero-poster.webp"
             className="absolute bottom-0 right-0 h-[290px] min-[420px]:h-[320px] sm:h-[380px] md:h-full w-auto max-w-none z-[2] pointer-events-none transform-gpu"
             style={{ clipPath: 'inset(0 0 4px 0)' }}
           >
-            <source src="/assets/aistudio/InShot_20261121_204512407_bfa2e43e.mp4" type="video/mp4" />
+            <source src="/assets/aistudio/opt/hero.mp4" type="video/mp4" />
           </video>
           {/* Clean solid white bottom seal bridging seamlessly into the #proof top white wave */}
           <div className="absolute bottom-0 left-0 right-0 h-[10px] bg-white z-[5] pointer-events-none" />
@@ -1027,29 +1201,7 @@ export default function App() {
           {/* 3 Distinct UI Enhancement Showcase 3D Flip Cards */}
           <div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 [&>*:last-child]:md:col-span-2 [&>*:last-child]:lg:col-span-1">
-              {[
-                {
-                  title: "Appropriate fonts and visuals",
-                  rawImg: "/assets/aistudio/Untitled6_20261122233208_4e01f8dd.png",
-                  enhancedImg: "/assets/aistudio/Untitled6_20261122233756_398a7fc8.png",
-                  rawText: "No text styling, blank footer and no images on cards make it difficult to identify flowers.",
-                  enhancedText: "Personally selected and uploaded flower images on cards and added navbar and footer styling."
-                },
-                {
-                  title: "Bookish theme on literature",
-                  rawImg: "/assets/aistudio/Untitled6_20261123001246_c2e05229.png",
-                  enhancedImg: "/assets/aistudio/Untitled6_20261123001526_c25c93c8.png",
-                  rawText: "Generic elements styling with no unique identity, although having sloppy structure.",
-                  enhancedText: "Created a book-style website design with artistic visuals and more interactive simulations."
-                },
-                {
-                  title: "Dark and light theme toggle",
-                  rawImg: "/assets/aistudio/Untitled6_20261122235425_e7970fea.png",
-                  enhancedImg: "/assets/aistudio/Untitled6_20261123000021_bec228d7.png",
-                  rawText: "A task management platform with simple styling and minimal animations having different styles on different pages.",
-                  enhancedText: "Implemented smooth theme toggle, inhanced assistant appearance and kept minecraft theme throughout the website."
-                }
-              ].map((item, idx) => (
+              {PROOF_ITEMS.map((item, idx) => (
                 <ProofFlipCard key={idx} item={item} />
               ))}
             </div>
@@ -1074,52 +1226,7 @@ export default function App() {
           {/* Published Projects: Dynamic Masonry Layout */}
           <div className="mb-20">
             <Masonry
-              items={[
-                {
-                  id: "pub-1",
-                  img: "/assets/aistudio/Untitled7_20261123011958_538ac064.png",
-                  url: "https://solo-leveling-system-xi.vercel.app",
-                  height: 540,
-                  title: "Solo Leveling System",
-                  desc: "A gamified task management and learning platform featuring XP progression, daily quests, and adaptive study workflows.",
-                  stack: ["React", "Firebase", "Gemini API"],
-                  imageFit: "contain",
-                  bgColor: "#ffffff"
-                },
-                {
-                  id: "pub-2",
-                  img: "/assets/aistudio/Untitled7_20261123011439_0b364adf.png",
-                  url: "https://example.com/infix-clothing",
-                  height: 540,
-                  title: "Election Explorer",
-                  desc: "A useful website for individuals which are trying to understand elections and are first time voters via a simulation.",
-                  stack: ["React", "Firebase"],
-                  imageFit: "contain",
-                  bgColor: "#ffffff"
-                },
-                {
-                  id: "pub-3",
-                  img: "/assets/aistudio/Untitled7_20261123005155_2617deeb.png",
-                  url: "https://cook-book-psi.vercel.app",
-                  height: 560,
-                  title: "Cookbook - Recipe Book & Planner",
-                  desc: "A curated recipe library and weekly meal planner equipped with an interactive macro and nutrition evaluator.",
-                  stack: ["TypeScript", "React", "Gemini API"],
-                  imageFit: "contain",
-                  bgColor: "#ffffff"
-                },
-                {
-                  id: "pub-4",
-                  img: "/assets/aistudio/Untitled7_20261123010249_d4fc6863.png",
-                  url: "https://floral-spectrum.vercel.app",
-                  height: 560,
-                  title: "Floral Spectrum",
-                  desc: "An interactive botanical reference platform built for botanists to explore rare species, taxonomy, and floral traits.",
-                  stack: ["React", "TailwindCSS"],
-                  imageFit: "contain",
-                  bgColor: "#ffffff"
-                }
-              ]}
+              items={PUBLISHED_PROJECTS}
               ease="power3.out"
               duration={0.6}
               stagger={0.14}
@@ -1138,13 +1245,24 @@ export default function App() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 md:gap-6 pt-2 pb-4">
               {UNPUBLISHED_PROJECTS.map((project) => (
                 <div 
-                  key={project.id} 
-                  className="unpublished-project-card relative aspect-square rounded-2xl overflow-hidden border border-stone-200/40 md:border-stone-200/60 bg-stone-50 flex items-center justify-center cursor-pointer group shadow-sm hover:shadow-md transition-shadow duration-300"
+                  key={project.id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open ${project.name} prototype gallery`}
+                  className="unpublished-project-card relative aspect-square rounded-2xl overflow-hidden border border-stone-200/40 md:border-stone-200/60 bg-stone-50 flex items-center justify-center cursor-pointer group shadow-sm hover:shadow-md transition-shadow duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8C2D40]"
                   onClick={() => setSelectedProject(project)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setSelectedProject(project);
+                    }
+                  }}
                 >
                   <img 
                     src={project.mainImg} 
                     alt={project.name} 
+                    loading="lazy"
+                    decoding="async"
                     className="prototype-hover-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                     referrerPolicy="no-referrer" 
                   />
@@ -1224,32 +1342,34 @@ export default function App() {
 
               {/* Wheel Stage starting directly from right edge */}
               <div className="h-[380px] sm:h-[420px] md:h-[480px] w-full relative bg-transparent overflow-hidden">
-                <OptionWheel
-                  items={[
-                    'JavaScript',
-                    'TypeScript',
-                    'React.js',
-                    'TailwindCSS',
-                    'System Design',
-                    'Firebase & Supabase',
-                    'GSAP & Motion',
-                    'Git & Github'
-                  ]}
-                  defaultSelected={2}
-                  textColor="#71717a"
-                  activeColor="#000000"
-                  side="right"
-                  fontSize={2.2}
-                  spacing={1.6}
-                  curve={1.2}
-                  tilt={7}
-                  blur={2.5}
-                  fade={0.35}
-                  smoothing={200}
-                  inset={24}
-                  loop={false}
-                  draggable={true}
-                />
+                <Suspense fallback={<div className="w-full h-full" />}>
+                  <OptionWheel
+                    items={[
+                      'JavaScript',
+                      'TypeScript',
+                      'React.js',
+                      'TailwindCSS',
+                      'System Design',
+                      'Firebase & Supabase',
+                      'GSAP & Motion',
+                      'Git & Github'
+                    ]}
+                    defaultSelected={2}
+                    textColor="#71717a"
+                    activeColor="#000000"
+                    side="right"
+                    fontSize={2.2}
+                    spacing={1.6}
+                    curve={1.2}
+                    tilt={7}
+                    blur={2.5}
+                    fade={0.35}
+                    smoothing={200}
+                    inset={24}
+                    loop={false}
+                    draggable={true}
+                  />
+                </Suspense>
               </div>
             </div>
           </div>
@@ -1267,7 +1387,9 @@ export default function App() {
         </div>
 
         <div className="w-full relative overflow-x-clip">
-          <GlassAssembly nextSectionId="education" />
+          <Suspense fallback={<div className="w-full h-screen bg-[#0D090B]" />}>
+            <GlassAssembly nextSectionId="education" />
+          </Suspense>
         </div>
       </section>
 
@@ -1292,31 +1414,34 @@ export default function App() {
         </div>
 
         <div className="w-full px-4 sm:px-6 md:px-12 pt-4 pb-2">
-          <CardStack
-            items={CREDENTIAL_STACK_ITEMS}
-            initialIndex={0}
-            maxVisible={5}
-            cardWidth={stackDimensions.width}
-            cardHeight={stackDimensions.height}
-            overlap={0.48}
-            spreadDeg={42}
-            depthPx={130}
-            autoAdvance
-            intervalMs={2600}
-            pauseOnHover
-            showDots
-            renderCard={(item) => (
-              <div className="h-full w-full overflow-hidden bg-white">
-                <img
-                  src={item.imageSrc}
-                  alt={item.title}
-                  className="h-full w-full object-contain"
-                  draggable={false}
-                  loading="eager"
-                />
-              </div>
-            )}
-          />
+          <Suspense fallback={<div style={{ height: stackDimensions.height + 90 }} />}>
+            <CardStack
+              items={CREDENTIAL_STACK_ITEMS}
+              initialIndex={0}
+              maxVisible={5}
+              cardWidth={stackDimensions.width}
+              cardHeight={stackDimensions.height}
+              overlap={0.48}
+              spreadDeg={42}
+              depthPx={130}
+              autoAdvance
+              intervalMs={2600}
+              pauseOnHover
+              showDots
+              renderCard={(item, { active }) => (
+                <div className="h-full w-full overflow-hidden bg-white">
+                  <img
+                    src={item.imageSrc}
+                    alt={item.title}
+                    className="h-full w-full object-contain"
+                    draggable={false}
+                    loading={active ? "eager" : "lazy"}
+                    decoding="async"
+                  />
+                </div>
+              )}
+            />
+          </Suspense>
         </div>
       </section>
 
@@ -1325,9 +1450,11 @@ export default function App() {
         {/* Responsive Footer Background Image (Statically anchored to bottom with bottom static effect) */}
         <div className="absolute top-12 sm:top-20 md:top-24 bottom-0 left-0 right-0 z-0 overflow-hidden pointer-events-none select-none bg-[#020404]">
           <img
-            src="/assets/aistudio/image_30b63e87_aa9ad8f6.jpg"
+            src="/assets/aistudio/opt/footer_bg.webp"
             alt=""
             aria-hidden="true"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover object-[66%_16%] lg:object-contain lg:object-right-bottom scale-[1.24] origin-[66%_22%] sm:scale-[1.28] sm:origin-[68%_22%] md:scale-[1.32] md:origin-[70%_22%] lg:scale-[1.4] lg:origin-[76%_22%] opacity-90 md:opacity-95 transition-transform duration-700 ease-out"
           />
 
@@ -1465,24 +1592,26 @@ export default function App() {
               <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-none text-white">
                 Let's work <br />
                 <span className="inline-block w-full max-w-[320px] sm:max-w-[420px] h-20 md:h-28 align-middle">
-                  <ParticleText
-                    text="together."
-                    particleSize={2.5}
-                    density={3}
-                    color="#8C2D40"
-                    highlightColor="#E06D85"
-                    scatter={140}
-                    gatherDuration={1600}
-                    stagger={380}
-                    pointerRepel={40}
-                    repelRadius={110}
-                    idleDrift={0.6}
-                    trigger="hover"
-                    fontSize="clamp(2.8rem, 6.5vw, 4.8rem)"
-                    fontWeight={800}
-                    fontFamily="inherit"
-                    glow
-                  />
+                  <Suspense fallback={<span className="text-[#8C2D40] font-extrabold">together.</span>}>
+                    <ParticleText
+                      text="together."
+                      particleSize={2.5}
+                      density={3}
+                      color="#8C2D40"
+                      highlightColor="#E06D85"
+                      scatter={140}
+                      gatherDuration={1600}
+                      stagger={380}
+                      pointerRepel={40}
+                      repelRadius={110}
+                      idleDrift={0.6}
+                      trigger="hover"
+                      fontSize="clamp(2.8rem, 6.5vw, 4.8rem)"
+                      fontWeight={800}
+                      fontFamily="inherit"
+                      glow
+                    />
+                  </Suspense>
                 </span>
               </h2>
               <p className="text-stone-400 text-lg mb-8 max-w-md">
@@ -1531,11 +1660,16 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Back to Top Button */}
+      {/* Back to Top Button (shown after scrolling past hero) */}
       <button 
+        type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 p-4 bg-[#581C24] text-white rounded-full shadow-2xl hover:bg-[#3D1017] hover:scale-110 transition-all z-40"
+        className={`fixed bottom-8 right-8 p-4 bg-[#581C24] text-white rounded-full shadow-2xl hover:bg-[#3D1017] hover:scale-110 transition-all duration-300 z-40 ${
+          showBackToTop ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
         aria-label="Back to Top"
+        aria-hidden={!showBackToTop}
+        tabIndex={showBackToTop ? 0 : -1}
       >
         <ChevronUp size={22} />
       </button>

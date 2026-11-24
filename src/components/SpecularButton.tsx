@@ -201,26 +201,7 @@ export const SpecularButton: React.FC<SpecularButtonProps> = ({
 
     let pointerAngle: number | null = null;
     let proximityT = 0;
-    const onPointerMove = (e: PointerEvent) => {
-      const rect = btn.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
-      const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom);
-      const dist = Math.hypot(dx, dy);
-
-      if (dist === 0) {
-        const nx = (e.clientX - cx) / (rect.width / 2);
-        const ny = (cy - e.clientY) / (rect.height / 2);
-        pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
-      } else {
-        pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
-      }
-      const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
-      proximityT = t * t * (3 - 2 * t);
-    };
-    window.addEventListener('pointermove', onPointerMove);
-
+    let isVisible = true;
     let angle = 2.4;
     let idleAngle = 2.4;
     let bright = 0;
@@ -230,15 +211,12 @@ export const SpecularButton: React.FC<SpecularButtonProps> = ({
     const lineC = new Color();
     const baseC = new Color();
 
-    const update = (now: number) => {
-      raf = requestAnimationFrame(update);
-      const dt = Math.min((now - last) / 1000, 0.05);
-      last = now;
+    const drawFrame = (dt: number) => {
       const p = propsRef.current;
 
       idleAngle += p.speed * dt;
       const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
-      const target = steer ? pointerAngle : idleAngle;
+      const target = steer ? pointerAngle! : idleAngle;
       const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
       angle += diff * (1 - Math.exp(-dt * 7));
 
@@ -257,10 +235,62 @@ export const SpecularButton: React.FC<SpecularButtonProps> = ({
       program.uniforms.uThickness.value = p.thickness * dpr;
       renderer.render({ scene: mesh });
     };
-    raf = requestAnimationFrame(update);
+
+    const update = (now: number) => {
+      raf = 0;
+      if (!isVisible || document.hidden || btn.offsetParent === null) return;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      drawFrame(dt);
+      const p = propsRef.current;
+      if (p.autoAnimate || proximityT > 0.002 || bright > 0.002) {
+        raf = requestAnimationFrame(update);
+      }
+    };
+
+    const wake = () => {
+      if (!raf && isVisible && !document.hidden && btn.offsetParent !== null) {
+        last = performance.now();
+        raf = requestAnimationFrame(update);
+      }
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isVisible || btn.offsetParent === null) return;
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
+      const dy = Math.max(rect.top - e.clientY, 0, e.clientY - rect.bottom);
+      const dist = Math.hypot(dx, dy);
+
+      if (dist === 0) {
+        const nx = (e.clientX - cx) / (rect.width / 2);
+        const ny = (cy - e.clientY) / (rect.height / 2);
+        pointerAngle = Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
+      } else {
+        pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
+      }
+      const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
+      proximityT = t * t * (3 - 2 * t);
+      if (proximityT > 0 || bright > 0.002) wake();
+    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+    const io = new IntersectionObserver((entries) => {
+      isVisible = entries.some((entry) => entry.isIntersecting);
+      if (isVisible && (propsRef.current.autoAnimate || proximityT > 0.002 || bright > 0.002)) {
+        wake();
+      }
+    });
+    io.observe(btn);
+
+    drawFrame(0);
+    if (propsRef.current.autoAnimate) wake();
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);

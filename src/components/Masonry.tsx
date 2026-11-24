@@ -70,18 +70,6 @@ const useMeasure = (): [React.RefObject<HTMLDivElement | null>, { width: number;
   return [ref, size];
 };
 
-const preloadImages = async (urls: string[]) => {
-  await Promise.all(
-    urls.map(
-      src =>
-        new Promise<void>(resolve => {
-          const img = new Image();
-          img.src = src;
-          img.onload = img.onerror = () => resolve();
-        })
-    )
-  );
-};
 
 export const Masonry: React.FC<MasonryProps> = ({
   items,
@@ -104,7 +92,6 @@ export const Masonry: React.FC<MasonryProps> = ({
   );
 
   const [containerRef, { width }] = useMeasure();
-  const [imagesReady, setImagesReady] = useState(false);
 
   const getInitialPosition = (item: any, index = 0) => {
     const containerRect = containerRef.current?.getBoundingClientRect();
@@ -138,9 +125,6 @@ export const Masonry: React.FC<MasonryProps> = ({
     }
   };
 
-  useEffect(() => {
-    preloadImages(items.map(i => i.img)).then(() => setImagesReady(true));
-  }, [items]);
 
   const { grid, totalHeight } = useMemo(() => {
     if (!width) return { grid: [], totalHeight: 0 };
@@ -170,7 +154,7 @@ export const Masonry: React.FC<MasonryProps> = ({
   latestGridRef.current = grid;
 
   useLayoutEffect(() => {
-    if (!imagesReady || grid.length === 0) return;
+    if (grid.length === 0) return;
 
     const containerEl = containerRef.current;
 
@@ -282,7 +266,7 @@ export const Masonry: React.FC<MasonryProps> = ({
         });
       });
     }
-  }, [grid, imagesReady, columns, stagger, animateFrom, blurToFocus, duration, ease, scrollTrigger]);
+  }, [grid, columns, stagger, animateFrom, blurToFocus, duration, ease, scrollTrigger]);
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>, item: MasonryItem) => {
     const element = e.currentTarget;

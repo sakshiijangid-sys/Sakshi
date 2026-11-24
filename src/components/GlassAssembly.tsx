@@ -980,7 +980,7 @@ export const GlassAssembly: React.FC<GlassAssemblyProps> = ({
     const instance = It(
       canvas,
       {
-        maxDpr: window.innerWidth < 640 ? 1.5 : 2,
+        maxDpr: window.innerWidth < 640 ? 1.25 : 1.5,
         reducedMotion: prefersReducedMotion,
         speed: prefersReducedMotion ? 0 : 1,
         interactive: !prefersReducedMotion,
@@ -998,7 +998,21 @@ export const GlassAssembly: React.FC<GlassAssemblyProps> = ({
     );
 
     assemblyRef.current = instance;
-    instance.start();
+
+    const visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.some((entry) => entry.isIntersecting);
+        if (visible) {
+          instance.start();
+        } else {
+          instance.stop();
+        }
+      },
+      { rootMargin: "120px 0px" }
+    );
+    if (containerRef.current) {
+      visibilityObserver.observe(containerRef.current);
+    }
 
     let rafId = 0;
     const handleScroll = () => {
@@ -1042,6 +1056,7 @@ export const GlassAssembly: React.FC<GlassAssemblyProps> = ({
     handleScroll();
 
     return () => {
+      visibilityObserver.disconnect();
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
       if (rafId) cancelAnimationFrame(rafId);
