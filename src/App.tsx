@@ -411,6 +411,14 @@ export default function App() {
     return { width: 500, height: 355 };
   });
 
+  const [isMobileView, setIsMobileView] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return (
+      window.innerWidth < 768 ||
+      Boolean(window.matchMedia?.("(hover: none), (pointer: coarse)")?.matches)
+    );
+  });
+
   useEffect(() => {
     const updateStackDimensions = () => {
       if (window.innerWidth < 640) {
@@ -420,6 +428,10 @@ export default function App() {
       } else {
         setStackDimensions({ width: 500, height: 355 });
       }
+      setIsMobileView(
+        window.innerWidth < 768 ||
+          Boolean(window.matchMedia?.("(hover: none), (pointer: coarse)")?.matches)
+      );
     };
     updateStackDimensions();
     window.addEventListener("resize", updateStackDimensions);
@@ -537,25 +549,27 @@ export default function App() {
 
   return (
     <div ref={containerRef} className="bg-white text-[#1A1A1A] font-sans antialiased selection:bg-[#966F33] selection:text-white overflow-x-clip w-full max-w-full">
-      {/* Global Swarm Cursor Overlay */}
-      <SwarmCursor
-        globalOverlay
-        hideCursor
-        dotSize={9}
-        count={130}
-        size={2.2}
-        color="#8C2D40"
-        accentColor="#EF4444"
-        spread={72}
-        swirl={0.6}
-        tail={0.5}
-        trail={0.65}
-        wander={0.5}
-        depth={0.7}
-        clickEffect="burst"
-        idle="hide"
-        lightMode
-      />
+      {/* Global Swarm Cursor Overlay (Desktop mouse views only) */}
+      {!isMobileView && (
+        <SwarmCursor
+          globalOverlay
+          hideCursor
+          dotSize={9}
+          count={130}
+          size={2.2}
+          color="#8C2D40"
+          accentColor="#EF4444"
+          spread={72}
+          swirl={0.6}
+          tail={0.5}
+          trail={0.65}
+          wander={0.5}
+          depth={0.7}
+          clickEffect="burst"
+          idle="hide"
+          lightMode
+        />
+      )}
       {/* Direct Interview Modal */}
       {showInviteModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-10">
@@ -1134,8 +1148,10 @@ export default function App() {
                     className="prototype-hover-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                     referrerPolicy="no-referrer" 
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center pointer-events-none">
-                    <p className="text-white text-xs font-bold uppercase tracking-widest drop-shadow-md">{project.name}</p>
+                  <div className="absolute inset-x-0 bottom-0 pt-10 pb-3 px-3.5 bg-gradient-to-t from-black/80 via-black/35 to-transparent pointer-events-none flex items-end justify-between">
+                    <h4 className="text-white text-sm sm:text-base font-bold tracking-tight leading-snug drop-shadow-sm truncate">
+                      {project.name}
+                    </h4>
                   </div>
                 </div>
               ))}

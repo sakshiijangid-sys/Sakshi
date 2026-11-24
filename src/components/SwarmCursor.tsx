@@ -880,6 +880,10 @@ const SwarmCursor: React.FC<SwarmCursorProps> = ({
     };
 
     const onPointerMove = (event: PointerEvent) => {
+      if (settingsRef.current.globalOverlay && event.pointerType !== 'mouse') {
+        pointer.inside = false;
+        return;
+      }
       const { x, y, inside } = locate(event);
       pointer.x = x;
       pointer.y = y;
@@ -888,6 +892,7 @@ const SwarmCursor: React.FC<SwarmCursorProps> = ({
 
     const onPointerDown = (event: PointerEvent) => {
       const s = settingsRef.current;
+      if (s.globalOverlay && event.pointerType !== 'mouse') return;
       const { x, y, inside } = locate(event);
       if (!inside || !s.enabled || reduce || s.clickEffect === 'none') return;
       const reachOut = s.spread * 2.2;
